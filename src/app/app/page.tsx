@@ -36,24 +36,14 @@ export default function Dashboard() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">RampSync - Atendimentos e Inspeções</h1>
-              <p className="text-gray-600">Sistema de Atendimentos Aeroportuários</p>
-            </div>
-            <div className="flex gap-3">
-              <Link href="/app/atendimentos/novo">
-                <Button>Novo Atendimento/Inspeção</Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex justify-end mb-6">
+          <Link href="/app/atendimentos/novo">
+            <Button>Novo Atendimento/Inspeção</Button>
+          </Link>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {stats.map((stat) => (
             <Card key={stat.title}>
@@ -77,7 +67,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {[
+                {[ 
                   { id: "001", aircraft: "PR-ABC", type: "Abastecimento", status: "Em andamento", time: "14:30" },
                   { id: "002", aircraft: "PR-DEF", type: "Limpeza", status: "Concluído", time: "13:45" },
                   { id: "003", aircraft: "PR-GHI", type: "Catering", status: "Pendente", time: "15:00" },
@@ -94,8 +84,8 @@ export default function Dashboard() {
                           item.status === "Concluído"
                             ? "bg-green-100 text-green-800"
                             : item.status === "Em andamento"
-                              ? "bg-blue-100 text-blue-800"
-                              : "bg-yellow-100 text-yellow-800"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-yellow-100 text-yellow-800"
                         }`}
                       >
                         {item.status}
@@ -118,3 +108,4 @@ export default function Dashboard() {
     </div>
   )
 }
+

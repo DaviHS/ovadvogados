@@ -2,6 +2,6 @@ import axios from "axios";
 
 import { env } from "@/env";
 
-const api = axios.create({ baseURL: env.DATABASE_URL });
+const api = axios.create({ baseURL: env.BASE_URL });
 
 export { api };

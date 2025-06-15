@@ -1,74 +1,79 @@
-"use client";
+"use client"
 
-import { useTransition } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { type SubmitHandler, useForm } from "react-hook-form";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import Fields from "./fields"
 
-import { Form } from "@/components/ui/form";
-import { useToast } from "@/hooks/use-toast";
-import { ButtonLoading } from "@/components/ui/button";
-import { signInSchema, type SignInSchema } from "@/validators/auth";
-import { Fields } from "./fields";
+export default function Form() {
+  const router = useRouter()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
 
-export const SignInForm = () => {
-  const { toast, toastError } = useToast();
-  const [isPending, startTransaction] = useTransition();
-  const router = useRouter();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setError("")
 
-  const form = useForm<SignInSchema>({
-    resolver: zodResolver(signInSchema),
-    defaultValues: {
-      userLogin: "",
-      password: "",
-    },
-  });
-
-  const onSubmit: SubmitHandler<SignInSchema> = async (d) => {
-    startTransaction(async () => {
-      const responseAuth = await signIn("credentials", {
-        ...d,
-        auth_type: "email_auth",
-        app_id: "4",
+    try {
+      const result = await signIn("credentials", {
         redirect: false,
-      });
+        email,
+        password,
+      })
 
-      if (responseAuth?.error) {
-        return toastError({
-          title: "Ocorreu um erro ao tentar se autenticar",
-          description: responseAuth.error,
-        });
+      if (result?.error) {
+        setError("Credenciais inválidas. Por favor, tente novamente.")
+      } else {
+        router.push("/dashboard")
       }
-
-      toast({ title: "Sucesso ao se autenticar!" });
-      const searchParams = new URLSearchParams(window.location.search);
-      const from = searchParams.get("from") || `/app`;
-  
-      return router.push(from);
-    });
-  };
+    } catch {
+      setError("Ocorreu um erro ao fazer login. Por favor, tente novamente.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-1">
-      <Image src={`/ico-ulp.png`} width={64} height={64} alt="ULP ícone" />
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="flex w-full max-w-sm flex-col gap-3"
-        >
-          <Fields />
-          <ButtonLoading isLoading={isPending}>Entrar</ButtonLoading>
-        </form>
-      </Form>
-      <p>
-        Não possui uma conta entre em contato com o{" "}
-        <Link href="#" className="text-muted-foreground">
-          Suporte!
-        </Link>
-      </p>
+    <div className="pt-24 w-full max-w-md">
+      <Card className="w-full">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold text-center text-primary">Área do Membro</CardTitle>
+          <CardDescription className="text-center">
+            Entre com suas credenciais para acessar sua conta
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {error && (
+            <div className="p-3 bg-red-100 text-red-600 text-sm rounded">
+              {error}
+            </div>
+          )}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Fields
+              email={email}
+              password={password}
+              onEmailChange={setEmail}
+              onPasswordChange={setPassword}
+            />
+            <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isLoading}>
+              {isLoading ? "Entrando..." : "Entrar"}
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter className="flex flex-col space-y-4">
+          <div className="text-center text-sm">
+            <span className="text-gray-500">Ainda não tem uma conta? </span>
+            <Link href="#" className="text-primary hover:underline">Fale com o suporte.</Link>
+          </div>
+        </CardFooter>
+      </Card>
     </div>
-  );
-};
+  )
+}

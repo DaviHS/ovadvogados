@@ -1,8 +1,9 @@
-export { default as About } from "./about";
-export { default as Contact } from "./contact";
+export { default as Benefits } from "./benefits";
+export { default as CtaFinal } from "./cta-final";
 export { default as Footer } from "./footer";
-export { default as Gallery } from "./gallery";
 export { default as Hero } from "./hero";
-export { default as History } from "./history";
-export { default as Navbar } from "./navbar"
-export { default as Services } from "./services";
+export { default as Problems } from "./problems";
+export { default as Header } from "./header";
+export { default as Solutions} from "./solutions";
+export { default as Validations } from "./validations";
+

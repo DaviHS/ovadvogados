@@ -31,7 +31,7 @@ export function SiteHeader() {
           <BreadcrumbList>
             <BreadcrumbItem>
               <Link href={`/app`}>
-                Painel de Ligações
+                RampSync
               </Link>
             </BreadcrumbItem>
           </BreadcrumbList>

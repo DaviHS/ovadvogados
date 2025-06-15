@@ -80,53 +80,44 @@ export default function AtendimentosPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Concluído":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 hover:bg-green-300 text-green-800"
       case "Em andamento":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 hover:bg-blue-300 text-blue-800"
       case "Pendente":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-100 hover:bg-yellow-300 text-yellow-800"
       case "Cancelado":
-        return "bg-red-100 text-red-800"
+        return "bg-red-100 hover:bg-red-300 text-red-800"
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 hover:bg-gray-300 text-gray-800"
     }
   }
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "Crítica":
-        return "bg-red-100 text-red-800"
+        return "bg-red-100 hover:bg-red-300 text-red-800"
       case "Alta":
-        return "bg-orange-100 text-orange-800"
+        return "bg-orange-100 hover:bg-orange-300 text-orange-800"
       case "Média":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-100 hover:bg-yellow-300 text-yellow-800"
       case "Baixa":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 hover:bg-green-300 text-green-800"
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 hover:bg-gray-300 text-gray-800"
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Atendimentos e Inspeções</h1>
-              <p className="text-gray-600">Gerencie todos os atendimentos aeroportuários com inspeções walkaround</p>
-            </div>
-            <Link href="/app/atendimentos/novo">
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Novo Atendimento/Inspeção
-              </Button>
-            </Link>
-          </div>
-        </div>
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex justify-end">
+        <Link href="/app/atendimentos/novo">
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Novo Atendimento/Inspeção
+          </Button>
+        </Link>
       </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />

@@ -1,40 +1,42 @@
-import Image from "next/image"
+// src/components/Hero.tsx
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ChevronRight } from "lucide-react"
-import Link from "next/link";
+import { ArrowRight } from "lucide-react"
 
 export default function Hero() {
   return (
-    <section id="inicio" className="relative bg-primary py-20 md:py-32">
-      <div className="container flex flex-col items-center text-center">
-        <div className="max-w-3xl space-y-6">
-          <h1 className="text-4xl font-bold tracking-tighter text-white sm:text-5xl md:text-6xl">
-            Bem-vindo à Igreja Central
-          </h1>
-          <p className="text-xl text-white/90 md:text-2xl">
-           Uma Vida Com Propósito
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="#cultos">
-              <Button size="lg" className="bg-secondary hover:bg-secondary/90 text-primary">
-                Nossos Cultos
-                <ChevronRight className="ml-2 h-4 w-4" />
+    <section className="bg-gradient-to-br from-blue-50 to-white py-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <Badge className="mb-4 bg-blue-100 text-blue-800">
+              Inovação em Automação Aeroportuária
+            </Badge>
+            <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
+              Construindo o futuro da <span className="text-blue-600">automação aeroportuária</span>
+            </h1>
+            <p className="text-xl text-gray-600 mb-8">
+              Estamos desenvolvendo uma plataforma inteligente para transformar a operação de aeroportos com
+              automação, IoT e inteligência de dados. Em fase de testes, já demonstramos ganhos expressivos de
+              eficiência.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
+                Quero Testar
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-            </Link>
-            <Link href="#historia">
-              <Button
-                size="lg"
-                variant="outline"
-                className="bg-transparent text-white border-white hover:bg-white/10"
-              >
-                Conheça Nossa História
+              <Button size="lg" variant="outline">
+                Falar com Especialista
               </Button>
-            </Link>
+            </div>
+          </div>
+          <div className="relative">
+            {/* Espaço reservado para imagem ou gráfico ilustrativo futuro */}
+            <div className="w-full h-64 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 font-semibold">
+              Visual de Sistema em Construção
+            </div>
           </div>
         </div>
-      </div>
-      <div className="absolute inset-0 z-[-1] opacity-10">
-        <Image src="/placeholder.svg?height=1080&width=1920" alt="Background" fill className="object-cover" priority />
       </div>
     </section>
   )

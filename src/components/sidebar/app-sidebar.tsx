@@ -17,7 +17,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { useSession } from "next-auth/react"
-import Link from "next/link"  // Importando o Link do Next.js
+import Link from "next/link"  
 
 const data = {
   navMain: [
@@ -34,7 +34,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   
   const user = {
     name: "Usuário",
-    email: "email@casasandreluiz.org.br",
+    email: "email@seuemail.com",
     treatment: "",
   }
 
@@ -44,17 +44,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              {/* Substituindo <a> por <Link> */}
               <Link href={`/app`}>
-                <div className="flex h-10 items-center gap-3">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={`/ico-ulp.png`} alt="Company logo" />
+                <div className="flex h-14 items-center gap-3">
+                  <Avatar className="h-6 w-6">
+                    <AvatarImage src={`/logo-aviao.png`} alt="Company logo" />
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Casas André Luiz</span>
-                  <span className="truncate text-xs">cad.casasandreluiz.org.br</span>
+                  <span className="truncate font-semibold">RampSync</span>
+                  <span className="truncate text-xs">email suporte aqui</span>
                 </div>
               </Link>
             </SidebarMenuButton>

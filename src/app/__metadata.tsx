@@ -4,13 +4,13 @@ export const metadata: Metadata = {
   title: {
     template: "%s - RampSync",
     default: "Web - RampSync",
-    absolute: "RampSync - Sistema de Atendimentos Aeroportuários",
+    absolute: "RampSync - Sistema Aeroportuários",
   },
-  description: "Sistema completo para gerenciamento de atendimentos e inspeções walkaround em aeroportos",
+  description: "Sistema completo para gerenciamento de aeroportos",
   icons: [
     {
       rel: "icon",
-      url: "/favicon.ico",
+      url: "/logo.ico",
     },
   ],
 };
