@@ -10,6 +10,7 @@ import {
   Validations } from "@/components/landingPage";
 
 export const Body = () => {
+
   return (
     <>
      <Hero/>

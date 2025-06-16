@@ -6,9 +6,9 @@ export interface ResponseAPI<T> {
 
 export interface UserAPI {
   userId: number;
-  name: string;
+  fullName: string;
   email: string; 
-  role: string;
+  enrollmentNumber: string;
 }
 
 export interface Field {

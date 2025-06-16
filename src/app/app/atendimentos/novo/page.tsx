@@ -22,7 +22,6 @@ import {
 } from "@/components/form/handling"
 import { 
   CargoHoldItem, 
-  ChecklistItem, 
   EquipmentUsed, 
   HandlingData, 
   InspectionPoint 
@@ -86,77 +85,30 @@ export default function NewHandlingPage() {
   const [formData, setFormData] = useState<HandlingData>(initialFormData)
   const [equipmentList, setEquipmentList] = useState<EquipmentUsed[]>([])
 
-  const [checklist, setChecklist] = useState<ChecklistItem[]>([
-    {
-      id: "1",
-      category: "Fuselagem",
-      item: "Verificar danos na fuselagem",
-      checked: false,
-      hasIssue: false,
-      observation: "",
-    },
-    {
-      id: "2",
-      category: "Fuselagem",
-      item: "Verificar portas e janelas",
-      checked: false,
-      hasIssue: false,
-      observation: "",
-    },
-    {
-      id: "3",
-      category: "Asas",
-      item: "Verificar superfície das asas",
-      checked: false,
-      hasIssue: false,
-      observation: "",
-    },
-    { id: "4", category: "Asas", item: "Verificar flaps e ailerons", checked: false, hasIssue: false, observation: "" },
-    {
-      id: "5",
-      category: "Trem de Pouso",
-      item: "Verificar pneus e rodas",
-      checked: false,
-      hasIssue: false,
-      observation: "",
-    },
-    { id: "6", category: "Trem de Pouso", item: "Verificar freios", checked: false, hasIssue: false, observation: "" },
-    { id: "7", category: "Motor", item: "Verificar entrada de ar", checked: false, hasIssue: false, observation: "" },
-    { id: "8", category: "Motor", item: "Verificar vazamentos", checked: false, hasIssue: false, observation: "" },
-    {
-      id: "9",
-      category: "Cauda",
-      item: "Verificar superfícies de controle",
-      checked: false,
-      hasIssue: false,
-      observation: "",
-    },
-    { id: "10", category: "Cauda", item: "Verificar antenas", checked: false, hasIssue: false, observation: "" },
-  ])
-
   const [inspectionPoints, setInspectionPoints] = useState<InspectionPoint[]>([
     {
       id: "porta_dianteira_esq",
       name: "Portas da Cabine de passageiros dianteira esquerda",
-      position: { top: "20%", left: "30%" },
+      position: { top: "10%", left: "34%" },
       checked: false,
     },
     {
       id: "porta_dianteira_dir",
-      name: "Porta-Passageiros dianteira direita",
-      position: { top: "20%", left: "60%" },
+      name: "Portas da Cabine de passageiros dianteira direita",
+      position: { top: "13%", left: "63%" },
       checked: false,
     },
-    { id: "gpu", name: "GPU Ground Power Unit", position: { top: "10%", left: "55%" }, checked: false },
-    { id: "acu", name: "ACU Air Conditioning Unit", position: { top: "30%", left: "30%" }, checked: false },
-    { id: "porao_dianteiro", name: "Porta-Porão dianteiro e painel de acesso", position: { top: "30%", left: "58%" }, checked: false },
-    { id: "porta_traseira_esq", name: "Porta traseira esquerda", position: { top: "60%", left: "35%" }, checked: false },
-    { id: "porta_traseira_dir", name: "Porta traseira direita", position: { top: "70%", left: "75%" }, checked: false },
-    { id: "porao_traseiro", name: "Porão traseiro", position: { top: "60%", left: "50%" }, checked: false },
-    { id: "qta", name: "QTA Compartimento (potável)", position: { top: "55%", left: "20%" }, checked: false },
-    { id: "qtu", name: "QTU Compartimento (dejetos)", position: { top: "80%", left: "25%" }, checked: false },
-    { id: "bulk_esquerdo", name: "Porta Bulk (esquerdo)", position: { top: "80%", left: "30%" }, checked: false },
-    { id: "bulk_direito", name: "Porta Bulk (direito)", position: { top: "80%", left: "70%" }, checked: false },
+    { id: "gpu", name: "Ground Power Unit (GPU)", position: { top: "3%", left: "90%" }, checked: false },
+    { id: "acu", name: "Air Conditioning Unit (ACU)", position: { top: "22%", left: "14%" }, checked: false },
+    
+    { id: "porao_dianteiro", name: "Porta de porão dianteiro e painel de acesso", position: { top: "30%", left: "66%" }, checked: false },
+    { id: "porta_traseira_esq", name: "Portas da Cabine de passageiros traseira esquerda", position: { top: "62%", left: "33%" }, checked: false },
+    { id: "porta_traseira_dir", name: "Portas da Cabine de passageiros traseira direita", position: { top: "72%", left: "64%" }, checked: false },
+    { id: "porao_traseiro", name: "Porta de porão traseiro e painel de acesso", position: { top: "66%", left: "67%" }, checked: false },
+    { id: "qta", name: "Portinhola compartimento (QTA)", position: { top: "73.5%", left: "23%" }, checked: false },
+    { id: "qtu", name: "Portinhola compartimento (QTU)", position: { top: "90%", left: "23%" }, checked: false },
+    { id: "bulk_esquerdo", name: "Porta Bulk (esquerdo)", position: { top: "94%", left: "52%" }, checked: false },
+    { id: "bulk_direito", name: "Porta Bulk (direito)", position: { top: "93%", left: "80%" }, checked: false },
   ])
 
   const [cargoHoldItems, setCargoHoldItems] = useState<CargoHoldItem[]>([
@@ -169,14 +121,11 @@ export default function NewHandlingPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    const issuesCount = checklist.filter((item) => item.hasIssue).length
     console.log("Complete handling data:", {
       formData,
       equipmentList,
-      checklist,
       inspectionPoints,
       cargoHoldItems,
-      issuesCount,
     })
     alert("Handling and inspection recorded successfully!")
   }
@@ -257,7 +206,7 @@ export default function NewHandlingPage() {
           />
 
           <div className="flex justify-end gap-4 pt-6">
-            <Link href="/app/handlings">
+            <Link href="/app/atendimentos">
               <Button 
                 variant="outline"
                 className="text-red-600 hover:text-red-700 hover:bg-red-300 border-red-300 hover:border-red-400 transition-colors"

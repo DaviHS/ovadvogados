@@ -9,15 +9,6 @@ export interface EquipmentUsed {
   registration: string
 }
 
-export interface ChecklistItem {
-  id: string
-  category: string
-  item: string
-  checked: boolean
-  hasIssue: boolean
-  observation: string
-}
-
 export interface CargoHoldItem {
   id: string
   name: string

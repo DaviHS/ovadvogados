@@ -24,14 +24,14 @@ export default function Form() {
     try {
       const result = await signIn("credentials", {
         redirect: false,
-        email,
+        userLogin: email,
         password,
       })
 
       if (result?.error) {
         setError("Credenciais inválidas. Por favor, tente novamente.")
       } else {
-        router.push("/dashboard")
+        router.push("/app")
       }
     } catch {
       setError("Ocorreu um erro ao fazer login. Por favor, tente novamente.")

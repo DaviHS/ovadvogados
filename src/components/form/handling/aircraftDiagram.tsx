@@ -1,6 +1,7 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
+import { Progress } from "@/components/ui/progress"
 import { InspectionPoint } from "@/types/handling"
 
 import Image from "next/image" 
@@ -9,6 +10,7 @@ interface AircraftDiagramProps {
   inspectionPoints: InspectionPoint[]
   setInspectionPoints: React.Dispatch<React.SetStateAction<InspectionPoint[]>>
 }
+
 export default function AircraftDiagram({ 
   inspectionPoints, 
   setInspectionPoints 
@@ -18,19 +20,31 @@ export default function AircraftDiagram({
       prev.map(item => item.id === id ? { ...item, checked } : item))
   }
 
+  const total = inspectionPoints.length
+  const completed = inspectionPoints.filter(p => p.checked).length
+  const progress = total === 0 ? 0 : Math.round((completed / total) * 100)
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>✈️ Diagrama da Aeronave (vista superior)</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="relative w-full h-[400px] border-2 border-gray-300 rounded-lg bg-gray-50 mb-6">
+
+        <div className="mb-6">
+          <div className="flex justify-between mb-2 text-sm font-medium">
+            <span>Progresso da Inspeção</span>
+            <span>{progress}%</span>
+          </div>
+          <Progress value={progress} />
+        </div>
+
+        <div className="relative w-full max-w-[400px] max-sm:max-w-[280px] aspect-[1/1] border-2 border-gray-300 rounded-lg bg-gray-50 mb-6 mx-auto">
           <Image
-            src="/aircraftTopView.png"
+            src="/aircraft.svg"
             alt="Diagrama da aeronave"
             fill
-            objectFit="contain"
-            className="rounded-lg"
+            className="object-contain rounded-lg"
           />
 
           {inspectionPoints.map((checkpoint) => (
@@ -42,17 +56,13 @@ export default function AircraftDiagram({
                 left: checkpoint.position.left,
               }}
             >
-              <div className="flex items-center space-x-1">
-                <Checkbox
-                  id={`checkpoint-${checkpoint.id}`}
-                  checked={checkpoint.checked}
-                  onCheckedChange={(checked) => 
-                    handleCheckpointChange(checkpoint.id, checked as boolean)}
-                />
-                <span className="text-xs font-medium bg-white px-1 rounded border">
-                  {checkpoint.name.split(" ")[0]}
-                </span>
-              </div>
+              <Checkbox
+                className="scale-75 max-sm:scale-50"
+                id={`checkpoint-${checkpoint.id}`}
+                checked={checkpoint.checked}
+                onCheckedChange={(checked) =>
+                  handleCheckpointChange(checkpoint.id, checked as boolean)}
+              />
             </div>
           ))}
         </div>

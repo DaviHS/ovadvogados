@@ -17,7 +17,7 @@ export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
       <body>
         <TRPCReactProvider>
           <SessionProvider>
-              {children}
+            {children}
           </SessionProvider>
         </TRPCReactProvider>
         <Sonner />

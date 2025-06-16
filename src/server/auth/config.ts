@@ -7,11 +7,12 @@ import {
 import Credentials from "next-auth/providers/credentials";
 import { type JWT } from "next-auth/jwt";
 
-import { api } from "@/lib/api";
-import type { ResponseAPI, UserAPI } from "@/types";
+import { eq } from "drizzle-orm";
+
 import { signInSchema } from "@/validators/auth";
-import { z } from "zod";
-import axios from "axios";
+import { db } from "@/db/client";
+import { users } from "@/db/schema";
+import bcrypt from "bcrypt";
 
 class InvalidLoginError extends CredentialsSignin {
   code = "Invalid identifier or password";
@@ -23,22 +24,12 @@ class InvalidLoginError extends CredentialsSignin {
   }
 }
 
-class AuthorizationLoginError extends CredentialsSignin {
-  code = "O usuário não tem permissão pra acessar o aplicativo!";
-
-  constructor(message: string) {
-    super(message);
-
-    this.code = message;
-  }
-}
-
 declare module "@auth/core/jwt" {
   interface JWT {
     userId: number;
-    name: string;
-    role: string;
-    email: string,
+    fullName: string;
+    email: string;
+    enrollmentNumber: string,
   }
 }
 
@@ -59,9 +50,9 @@ declare module "next-auth" {
 
   interface User {
     userId: number;
-    name: string;
-    role: string;
-    email: string,
+    fullName: string;
+    email: string;
+    enrollmentNumber: string,
     // ...other properties
     // role: UserRole;
   }
@@ -90,57 +81,35 @@ export const authConfig = {
       },
       async authorize(credentials) {
         console.log("[authorize]: ", credentials);
-        if (!credentials)
-          throw new Error("Necessário informar as credenciais!");
+        if (!credentials) throw new Error("Necessário informar as credenciais!");
 
-        const { userLogin, password, auth_type } = await signInSchema
-          .extend({
-            auth_type: z.enum(["re_auth", "email_auth", "facial_auth"]),
-            app_id: z.string()
-          })
-          .parseAsync(credentials);
+        const { userLogin, password } = await signInSchema.parseAsync(credentials);
 
-        try {
-          const response = await api.post<ResponseAPI<UserAPI>>("/auth/login", {
-            userLogin,
-            password,
-          });
+        // ✅ Buscar usuário por email
+        const [user] = await db
+          .select()
+          .from(users)
+          .where(eq(users.email, userLogin))
+          .limit(1);
 
-          console.log("[LOGIN RES STATUS]:", response.status);
-          console.log("[LOGIN RES DATA]:", response.data);
+        if (!user) throw new InvalidLoginError("Usuário não encontrado");
 
-          if (response.data.error)
-            throw new InvalidLoginError(response.data.message);
+        const passwordOk = await bcrypt.compare(password, user.passwordHash);
 
-          const { data } = response.data;
+        if (!passwordOk) throw new InvalidLoginError("Senha incorreta");
 
-          const user: User = {
-            userId: data.userId,
-            name: data.name,
-            email: data.email,
-            role: data.role
-          };
-
-          return user;
-        } catch (err) {
-          if (axios.isAxiosError(err)) {
-            console.error("[LOGIN ERROR - AXIOS]:", err.response?.status, await err.response?.data);
-          } else {
-            console.error("[LOGIN ERROR - GENERIC]:", err);
-          }
-          throw err;
+        if (!user.email) {
+          throw new InvalidLoginError("Usuário sem e-mail cadastrado.");
         }
+
+        return {
+          userId: user.userId,
+          fullName: user.fullName,
+          email: user.email,
+          enrollmentNumber: user.enrollmentNumber ?? "",
+        } satisfies User;
       },
     }),
-    /**
-     * ...add more providers here.
-     *
-     * Most other providers require a bit more work than the Discord provider. For example, the
-     * GitHub provider requires you to add the `refresh_token_expires_in` field to the Account
-     * model. Refer to the NextAuth.js docs for the provider you want to use. Example:
-     *
-     * @see https://next-auth.js.org/providers/github
-     */
   ],
   callbacks: {
     jwt({ token, user, trigger, session }) {
@@ -161,18 +130,16 @@ export const authConfig = {
       }
       return token;
     },
-    session: ({ session, token }) => {
-      // console.log("[token:2]: ", token);
-
+    session({ session, token }) {
       return {
         ...session,
         user: {
           ...session.user,
-          userId: token.userId,
-          name: token.name,
-          email: token.email,
-          role: token.role,
           id: token.sub,
+          userId: token.userId,
+          fullName: token.fullName,
+          email: token.email,
+          enrollmentNumber: token.enrollmentNumber,
         },
       };
     },
