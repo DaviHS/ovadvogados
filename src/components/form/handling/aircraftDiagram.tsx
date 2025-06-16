@@ -3,11 +3,12 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { InspectionPoint } from "@/types/handling"
 
+import Image from "next/image" 
+
 interface AircraftDiagramProps {
   inspectionPoints: InspectionPoint[]
   setInspectionPoints: React.Dispatch<React.SetStateAction<InspectionPoint[]>>
 }
-
 export default function AircraftDiagram({ 
   inspectionPoints, 
   setInspectionPoints 
@@ -24,19 +25,14 @@ export default function AircraftDiagram({
       </CardHeader>
       <CardContent>
         <div className="relative w-full h-[400px] border-2 border-gray-300 rounded-lg bg-gray-50 mb-6">
-          {/* Simplified aircraft drawing */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[60%] h-[80%]">
-            {/* Fuselage */}
-            <div className="absolute top-[10%] left-[20%] w-[60%] h-[80%] bg-gray-200 rounded-full"></div>
-            {/* Wings */}
-            <div className="absolute top-[40%] left-0 w-[100%] h-[20%] bg-gray-300"></div>
-            {/* Tail */}
-            <div className="absolute top-[70%] left-[45%] w-[10%] h-[30%] bg-gray-300"></div>
-            {/* Horizontal stabilizers */}
-            <div className="absolute top-[80%] left-[35%] w-[30%] h-[5%] bg-gray-300"></div>
-          </div>
+          <Image
+            src="/aircraftTopView.png"
+            alt="Diagrama da aeronave"
+            fill
+            objectFit="contain"
+            className="rounded-lg"
+          />
 
-          {/* Inspection points */}
           {inspectionPoints.map((checkpoint) => (
             <div
               key={checkpoint.id}

@@ -134,28 +134,27 @@ export default function NewHandlingPage() {
     { id: "10", category: "Cauda", item: "Verificar antenas", checked: false, hasIssue: false, observation: "" },
   ])
 
-  // Pontos de inspeção no diagrama da aeronave
   const [inspectionPoints, setInspectionPoints] = useState<InspectionPoint[]>([
     {
       id: "porta_dianteira_esq",
-      name: "Porta dianteira esquerda",
-      position: { top: "30%", left: "25%" },
+      name: "Portas da Cabine de passageiros dianteira esquerda",
+      position: { top: "20%", left: "30%" },
       checked: false,
     },
     {
       id: "porta_dianteira_dir",
-      name: "Porta dianteira direita",
-      position: { top: "30%", left: "75%" },
+      name: "Porta-Passageiros dianteira direita",
+      position: { top: "20%", left: "60%" },
       checked: false,
     },
-    { id: "porta_traseira_esq", name: "Porta traseira esquerda", position: { top: "70%", left: "25%" }, checked: false },
+    { id: "gpu", name: "GPU Ground Power Unit", position: { top: "10%", left: "55%" }, checked: false },
+    { id: "acu", name: "ACU Air Conditioning Unit", position: { top: "30%", left: "30%" }, checked: false },
+    { id: "porao_dianteiro", name: "Porta-Porão dianteiro e painel de acesso", position: { top: "30%", left: "58%" }, checked: false },
+    { id: "porta_traseira_esq", name: "Porta traseira esquerda", position: { top: "60%", left: "35%" }, checked: false },
     { id: "porta_traseira_dir", name: "Porta traseira direita", position: { top: "70%", left: "75%" }, checked: false },
-    { id: "gpu", name: "Ground Power Unit (GPU)", position: { top: "40%", left: "15%" }, checked: false },
-    { id: "acu", name: "Air Conditioning Unit (ACU)", position: { top: "50%", left: "15%" }, checked: false },
-    { id: "porao_dianteiro", name: "Porão dianteiro", position: { top: "40%", left: "50%" }, checked: false },
     { id: "porao_traseiro", name: "Porão traseiro", position: { top: "60%", left: "50%" }, checked: false },
-    { id: "qta", name: "Compartimento QTA (potável)", position: { top: "55%", left: "20%" }, checked: false },
-    { id: "qtu", name: "Compartimento QTU (dejetos)", position: { top: "55%", left: "80%" }, checked: false },
+    { id: "qta", name: "QTA Compartimento (potável)", position: { top: "55%", left: "20%" }, checked: false },
+    { id: "qtu", name: "QTU Compartimento (dejetos)", position: { top: "80%", left: "25%" }, checked: false },
     { id: "bulk_esquerdo", name: "Porta Bulk (esquerdo)", position: { top: "80%", left: "30%" }, checked: false },
     { id: "bulk_direito", name: "Porta Bulk (direito)", position: { top: "80%", left: "70%" }, checked: false },
   ])
@@ -226,7 +225,7 @@ export default function NewHandlingPage() {
             equipmentList={equipmentList}
             setEquipmentList={setEquipmentList}
           />
-          
+
           <AircraftDiagram 
             inspectionPoints={inspectionPoints}
             setInspectionPoints={setInspectionPoints}
