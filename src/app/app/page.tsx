@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Plane, ClipboardCheck, Users, AlertTriangle } from "lucide-react"
 import Link from "next/link"
 
-export default function Dashboard() {
+export default function Handling() {
   const stats = [
     {
       title: "Atendimentos Hoje",
@@ -37,9 +37,9 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto py-4">
         <div className="flex justify-end mb-6">
-          <Link href="/app/atendimentos/novo">
+          <Link href="/atendimentos/novo">
             <Button>Novo Atendimento/Inspeção</Button>
           </Link>
         </div>
@@ -95,7 +95,7 @@ export default function Dashboard() {
                 ))}
               </div>
               <div className="mt-4">
-                <Link href="/app/atendimentos">
+                <Link href="/atendimentos">
                   <Button variant="outline" className="w-full">
                     Ver Todos os Atendimentos
                   </Button>

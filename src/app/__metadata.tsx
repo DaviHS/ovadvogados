@@ -6,7 +6,7 @@ export const metadata: Metadata = {
     default: "Web - RampSync",
     absolute: "RampSync - Sistema Aeroportuários",
   },
-  description: "Sistema completo para gerenciamento de aeroportos",
+    description: "Transforme seu aeroporto com soluções de automação de ponta. Reduza custos, aumente eficiência e garanta conformidade total.",
   icons: [
     {
       rel: "icon",

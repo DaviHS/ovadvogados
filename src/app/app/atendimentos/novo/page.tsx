@@ -206,7 +206,7 @@ export default function NewHandlingPage() {
           />
 
           <div className="flex justify-end gap-4 pt-6">
-            <Link href="/app/atendimentos">
+            <Link href="/atendimentos">
               <Button 
                 variant="outline"
                 className="text-red-600 hover:text-red-700 hover:bg-red-300 border-red-300 hover:border-red-400 transition-colors"

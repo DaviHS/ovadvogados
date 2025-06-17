@@ -10,9 +10,9 @@ import { type JWT } from "next-auth/jwt";
 import { eq } from "drizzle-orm";
 
 import { signInSchema } from "@/validators/auth";
-import { db } from "@/db/client";
-import { users } from "@/db/schema";
-import bcrypt from "bcrypt";
+import { db } from "@/server/db";
+import { users } from "@/server/db/schema";
+import { compare } from "bcrypt-ts";
 
 class InvalidLoginError extends CredentialsSignin {
   code = "Invalid identifier or password";
@@ -42,7 +42,7 @@ declare module "@auth/core/jwt" {
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
-      id: string;
+      id: number;
       // ...other properties
       // role: UserRole;
     } & DefaultSession["user"];
@@ -76,36 +76,35 @@ export const authConfig = {
   providers: [
     Credentials({
       credentials: {
-        userLogin: {},
+        email: {},
         password: {},
       },
       async authorize(credentials) {
         console.log("[authorize]: ", credentials);
         if (!credentials) throw new Error("Necessário informar as credenciais!");
 
-        const { userLogin, password } = await signInSchema.parseAsync(credentials);
+        const { email, password } = await signInSchema.parseAsync(credentials);
 
-        // ✅ Buscar usuário por email
         const [user] = await db
           .select()
           .from(users)
-          .where(eq(users.email, userLogin))
+          .where(eq(users.email, email))
           .limit(1);
 
         if (!user) throw new InvalidLoginError("Usuário não encontrado");
 
-        const passwordOk = await bcrypt.compare(password, user.passwordHash);
+       const passwordOk = await compare(password, user.passwordHash);
 
-        if (!passwordOk) throw new InvalidLoginError("Senha incorreta");
+       if (!passwordOk) throw new InvalidLoginError("Senha incorreta");
 
-        if (!user.email) {
+        if (!users) {
           throw new InvalidLoginError("Usuário sem e-mail cadastrado.");
         }
 
         return {
           userId: user.userId,
           fullName: user.fullName,
-          email: user.email,
+          email: user.email ?? "",
           enrollmentNumber: user.enrollmentNumber ?? "",
         } satisfies User;
       },

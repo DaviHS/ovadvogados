@@ -88,7 +88,7 @@ export default function Header() {
               {session ? (
                 <>
                   <Button asChild variant="outline">
-                    <Link href="/dashboard" onClick={() => setMenuAberto(false)}>
+                    <Link href="/atendimentos" onClick={() => setMenuAberto(false)}>
                       Dashboard
                     </Link>
                   </Button>

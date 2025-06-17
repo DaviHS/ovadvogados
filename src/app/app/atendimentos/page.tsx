@@ -110,7 +110,7 @@ export default function AtendimentosPage() {
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex justify-end">
-        <Link href="/app/atendimentos/novo">
+        <Link href="/atendimentos/novo">
           <Button>
             <Plus className="h-4 w-4 mr-2" />
             Novo Atendimento/Inspeção
@@ -181,7 +181,7 @@ export default function AtendimentosPage() {
                     <Button variant="outline" size="sm">
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <Link href={`/app/atendimentos/${atendimento.id}/editar`}>
+                    <Link href={`/atendimentos/${atendimento.id}/editar`}>
                       <Button variant="outline" size="sm">
                         <Edit className="h-4 w-4" />
                       </Button>

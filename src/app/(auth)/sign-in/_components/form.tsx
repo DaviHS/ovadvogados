@@ -24,7 +24,7 @@ export default function Form() {
     try {
       const result = await signIn("credentials", {
         redirect: false,
-        userLogin: email,
+        email,
         password,
       })
 

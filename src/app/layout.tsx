@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { fontSans } from "@/config/fonts";
 import { ThemeProvider } from "@/components/theme-provider"
+import { PageProvider } from "@/contexts/page-context";
 
 export * from "./__metadata";
 
@@ -17,7 +18,16 @@ export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
       <body>
         <TRPCReactProvider>
           <SessionProvider>
-            {children}
+            <ThemeProvider 
+              attribute="class" 
+              defaultTheme="light" 
+              enableSystem 
+              disableTransitionOnChange
+            >
+              <PageProvider>
+                {children}
+              </PageProvider>
+            </ThemeProvider>
           </SessionProvider>
         </TRPCReactProvider>
         <Sonner />
