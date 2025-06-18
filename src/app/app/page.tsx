@@ -39,7 +39,7 @@ export default function Handling() {
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto py-4">
         <div className="flex justify-end mb-6">
-          <Link href="/atendimentos/novo">
+          <Link href="/walkarounds/novo">
             <Button>Novo Atendimento/Inspeção</Button>
           </Link>
         </div>
@@ -95,7 +95,7 @@ export default function Handling() {
                 ))}
               </div>
               <div className="mt-4">
-                <Link href="/atendimentos">
+                <Link href="/walkarounds">
                   <Button variant="outline" className="w-full">
                     Ver Todos os Atendimentos
                   </Button>

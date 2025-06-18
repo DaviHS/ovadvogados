@@ -1,10 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import Link from "next/link"
-import { ArrowLeft, Save } from "lucide-react"
+import { Save } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import {
   FlightIdentification,
   FlightData,
@@ -19,13 +18,14 @@ import {
   Cancellation,
   Signature,
   GeneralNotes,
-} from "@/components/form/handling"
+} from "@/components/form/walkarounds"
 import { 
   CargoHoldItem, 
   EquipmentUsed, 
   HandlingData, 
   InspectionPoint 
 } from "@/types/handling"
+import { usePageInfo } from "@/hooks/use-page-info"
 
 const initialFormData: HandlingData = {
   flightNumber: "",
@@ -81,7 +81,18 @@ const initialFormData: HandlingData = {
   generalNotes: "",
 }
 
-export default function NewHandlingPage() {
+export default function NewWalkaroundPage() {
+  const breadcrumbs = useMemo(() => [ 
+    { label: "RampSync", href: "/app" }, 
+    { label: "Walkarounds", href: "/walkarounds" },
+    { label: "Novo" }],
+  []);
+    
+  usePageInfo({
+    title: "Novo Atendimento e Inspeção Walkarounds",
+    breadcrumbs
+  })
+    
   const [formData, setFormData] = useState<HandlingData>(initialFormData)
   const [equipmentList, setEquipmentList] = useState<EquipmentUsed[]>([])
 
@@ -161,7 +172,7 @@ export default function NewHandlingPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto sm:px-2 lg:px-4 py-4 flex justify-end">
         <form onSubmit={handleSubmit} className="space-y-6">
           <FlightIdentification formData={formData} handleChange={handleChange} />
           <FlightData formData={formData} handleChange={handleChange} />
@@ -206,7 +217,7 @@ export default function NewHandlingPage() {
           />
 
           <div className="flex justify-end gap-4 pt-6">
-            <Link href="/atendimentos">
+            <Link href="/walkarounds">
               <Button 
                 variant="outline"
                 className="text-red-600 hover:text-red-700 hover:bg-red-300 border-red-300 hover:border-red-400 transition-colors"

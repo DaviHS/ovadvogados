@@ -12,15 +12,13 @@ export default function AppLayout({ children }: Readonly<PropsWithChildren>) {
         <SiteHeader />
         <div className="flex flex-1 h-full">
           <AppSidebar />
-          <div className="flex-1 h-full overflow-auto font-sans">
-            <div className="w-full h-full overflow-x-hidden overflow-y-auto">
-              <div className="mx-auto w-full px-4 sm:px-6 lg:px-8">
+            <div className="flex-1 overflow-auto font-sans">
+              <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 bg-gray-50">
                 <PageContent>
                   {children}
                 </PageContent>
               </div>
             </div>
-          </div>
         </div>
       </SidebarProvider>
     </div>

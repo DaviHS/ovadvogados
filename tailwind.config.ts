@@ -4,6 +4,20 @@ import { fontFamily } from "tailwindcss/defaultTheme";
 export default {
   darkMode: ["class"],
   content: ["./src/**/*.tsx"],
+  safelist: [
+    "hover:bg-purple-300",
+    "hover:bg-orange-300",
+    "hover:bg-gray-300",
+    "hover:bg-yellow-300",
+    "bg-purple-100",
+    "bg-orange-100",
+    "bg-gray-100",
+    "bg-yellow-100",
+    "text-purple-800",
+    "text-orange-800",
+    "text-gray-800",
+    "text-yellow-800",
+  ],
   theme: {
     extend: {
       fontFamily: {

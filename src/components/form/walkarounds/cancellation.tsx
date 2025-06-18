@@ -14,7 +14,7 @@ export default function Cancellation({ formData, handleChange }: CancellationPro
   return (
     <Card>
       <CardHeader>
-        <CardTitle>9. Dados para Cancelamento</CardTitle>
+        <CardTitle>11. Dados para Cancelamento</CardTitle>
       </CardHeader>
       <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>

@@ -14,7 +14,7 @@ export default function Signature({ formData, handleChange }: SignatureProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>10. Conferência e Assinatura</CardTitle>
+        <CardTitle>12. Conferência e Assinatura</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

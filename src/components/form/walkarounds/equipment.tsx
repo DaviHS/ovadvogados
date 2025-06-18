@@ -3,6 +3,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Plus, Trash2 } from "lucide-react"
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select"
 import { EquipmentUsed } from "@/types/handling"
 
 interface EquipmentProps {
@@ -54,7 +61,7 @@ export default function Equipment({ equipmentList, setEquipmentList }: Equipment
   }
 
   const updateEquipment = (id: string, field: keyof EquipmentUsed, value: string | number) => {
-    setEquipmentList(equipmentList.map(eq => 
+    setEquipmentList(equipmentList.map(eq =>
       eq.id === id ? { ...eq, [field]: value } : eq
     ))
   }
@@ -80,18 +87,21 @@ export default function Equipment({ equipmentList, setEquipmentList }: Equipment
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
                   <div>
                     <Label>Equipamento</Label>
-                    <select
+                    <Select
                       value={eq.equipment}
-                      onChange={(e) => updateEquipment(eq.id, "equipment", e.target.value)}
-                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                      onValueChange={(value) => updateEquipment(eq.id, "equipment", value)}
                     >
-                      <option value="">Selecione...</option>
-                      {availableEquipment.map((equipment) => (
-                        <option key={equipment} value={equipment}>
-                          {equipment}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Selecione..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableEquipment.map((equipment) => (
+                          <SelectItem key={equipment} value={equipment}>
+                            {equipment}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <Label>Qtd.</Label>
@@ -142,7 +152,7 @@ export default function Equipment({ equipmentList, setEquipmentList }: Equipment
                       variant="outline"
                       size="sm"
                       onClick={() => removeEquipment(eq.id)}
-                      className="text-red-600 hover:text-white hover:bg-red-500"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-300 border-red-300 hover:border-red-400 transition-colors"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

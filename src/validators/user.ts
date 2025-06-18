@@ -14,4 +14,4 @@ export const userSchema = z.object({
   )
 });
 
-export type SignInSchema = z.infer<typeof userSchema>;
+export type UserSchema = z.infer<typeof userSchema>;

@@ -1,12 +1,15 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Search, Plus, Edit, Eye } from "lucide-react"
 import Link from "next/link"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+import { getPriorityColor, getStatusColor } from "@/lib"
+import { usePageInfo } from "@/hooks/use-page-info"
 
 interface Atendimento {
   id: string
@@ -20,7 +23,17 @@ interface Atendimento {
   priority: "Baixa" | "Média" | "Alta" | "Crítica"
 }
 
-export default function AtendimentosPage() {
+export default function WalkaroundsPage() {
+  const breadcrumbs = useMemo(() => [ 
+    { label: "RampSync", href: "/app" }, 
+    { label: "Walkaround" }],
+  []);
+  
+  usePageInfo({
+    title: "Atendimentos e Inspeção Walkarounds",
+    breadcrumbs
+  })
+    
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
 
@@ -77,82 +90,54 @@ export default function AtendimentosPage() {
     return matchesSearch && matchesStatus
   })
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Concluído":
-        return "bg-green-100 hover:bg-green-300 text-green-800"
-      case "Em andamento":
-        return "bg-blue-100 hover:bg-blue-300 text-blue-800"
-      case "Pendente":
-        return "bg-yellow-100 hover:bg-yellow-300 text-yellow-800"
-      case "Cancelado":
-        return "bg-red-100 hover:bg-red-300 text-red-800"
-      default:
-        return "bg-gray-100 hover:bg-gray-300 text-gray-800"
-    }
-  }
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "Crítica":
-        return "bg-red-100 hover:bg-red-300 text-red-800"
-      case "Alta":
-        return "bg-orange-100 hover:bg-orange-300 text-orange-800"
-      case "Média":
-        return "bg-yellow-100 hover:bg-yellow-300 text-yellow-800"
-      case "Baixa":
-        return "bg-green-100 hover:bg-green-300 text-green-800"
-      default:
-        return "bg-gray-100 hover:bg-gray-300 text-gray-800"
-    }
-  }
-
   return (
     <div className="min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex justify-end">
-        <Link href="/atendimentos/novo">
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            Novo Atendimento/Inspeção
-          </Button>
-        </Link>
-      </div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div className="max-w-7xl mx-auto">
+        <div className="pb-4 flex justify-end">
+          <Link href="/walkarounds/new">
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Novo Atendimento/Inspeção
+            </Button>
+          </Link>
+        </div>
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="relative flex-1">
+          <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
               placeholder="Buscar por aeronave, empresa ou serviço..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-10 w-full"
             />
           </div>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">Todos os Status</option>
-            <option value="Pendente">Pendente</option>
-            <option value="Em andamento">Em andamento</option>
-            <option value="Concluído">Concluído</option>
-            <option value="Cancelado">Cancelado</option>
-          </select>
+          <div className="w-full sm:w-[220px]">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Todos os Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os Status</SelectItem>
+                <SelectItem value="Pendente">Pendente</SelectItem>
+                <SelectItem value="Em andamento">Em andamento</SelectItem>
+                <SelectItem value="Concluído">Concluído</SelectItem>
+                <SelectItem value="Cancelado">Cancelado</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-
-        <div className="grid gap-4">
+        <div className="grid grid-cols-1 gap-6 mb-8">
           {filteredAtendimentos.map((atendimento) => (
             <Card key={atendimento.id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-4 mb-2">
-                      <h3 className="text-lg font-semibold">{atendimento.aircraft}</h3>
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap mb-2">
+                      <h3 className="text-lg font-semibold break-words">{atendimento.aircraft}</h3>
                       <Badge className={getStatusColor(atendimento.status)}>{atendimento.status}</Badge>
                       <Badge className={getPriorityColor(atendimento.priority)}>{atendimento.priority}</Badge>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600 break-words">
                       <div>
                         <p className="font-medium">Empresa</p>
                         <p>{atendimento.company}</p>
@@ -166,7 +151,7 @@ export default function AtendimentosPage() {
                         <p>{atendimento.responsible}</p>
                       </div>
                     </div>
-                    <div className="flex gap-4 mt-2 text-sm text-gray-600">
+                    <div className="flex flex-wrap gap-4 mt-2 text-sm text-gray-600">
                       <div>
                         <span className="font-medium">Início:</span> {atendimento.startTime}
                       </div>
@@ -177,12 +162,20 @@ export default function AtendimentosPage() {
                       )}
                     </div>
                   </div>
-                  <div className="flex gap-2 ml-4">
-                    <Button variant="outline" size="sm">
+                  <div className="flex-shrink-0 flex gap-2 mt-4 sm:mt-0 sm:ml-4 justify-end self-stretch sm:self-auto">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="text-green-600 hover:text-green-700 hover:bg-green-300 border-green-300 hover:border-green-400 transition-colors"
+                    >
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <Link href={`/atendimentos/${atendimento.id}/editar`}>
-                      <Button variant="outline" size="sm">
+                    <Link href={`/walkarounds/${atendimento.id}/edit`}>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-300 border-blue-300 hover:border-blue-400 transition-colors"
+                      >
                         <Edit className="h-4 w-4" />
                       </Button>
                     </Link>

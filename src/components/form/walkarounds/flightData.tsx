@@ -2,6 +2,13 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { HandlingData } from "@/types/handling"
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select"
 
 interface FlightDataProps {
   formData: HandlingData
@@ -27,6 +34,7 @@ export default function FlightData({ formData, handleChange }: FlightDataProps) 
             placeholder="E.g., GRU"
           />
         </div>
+
         <div>
           <Label htmlFor="destination">Rota - Destino</Label>
           <Input
@@ -37,20 +45,30 @@ export default function FlightData({ formData, handleChange }: FlightDataProps) 
             placeholder="E.g., CGH"
           />
         </div>
+
         <div>
           <Label htmlFor="parkingPosition">Posição *</Label>
-          <select
-            id="parkingPosition"
-            name="parkingPosition"
+          <Select
             value={formData.parkingPosition}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
+            onValueChange={(value) =>
+              handleChange({
+                target: {
+                  name: "parkingPosition",
+                  value,
+                },
+              } as React.ChangeEvent<HTMLInputElement>)
+            }
           >
-            <option value="Finger">Finger</option>
-            <option value="Remote">Remote</option>
-          </select>
+            <SelectTrigger id="parkingPosition" className="w-full">
+              <SelectValue placeholder="Selecione a posição" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Finger">Finger</SelectItem>
+              <SelectItem value="Remote">Remote</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
+
         <div>
           <Label htmlFor="aircraftModel">Modelo da Aeronave</Label>
           <Input

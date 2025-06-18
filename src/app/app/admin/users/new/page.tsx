@@ -8,10 +8,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { ArrowLeft, Save, Eye, EyeOff } from "lucide-react"
+import { Save, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import { api } from "@/trpc/react"
 import { usePageInfo } from "@/hooks/use-page-info"
+import { useToast } from "@/hooks/use-toast"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 
 interface CompanyAssignment {
   companyId: number
@@ -23,16 +25,16 @@ interface CompanyAssignment {
 export default function NewUserPage() {
   const breadcrumbs = useMemo(() => [ 
     { label: "RampSync", href: "/app" }, 
-    { label: "Usuários", href: "/usuarios" }, 
+    { label: "Usuários", href: "/admin/users" }, 
     { label: "Cadastro" }],
-  []);
+  [])
 
   usePageInfo({
     title: "Cadastro de Usuários",
-    //subtitle: "Cadastre um novo usuário no sistema",
     breadcrumbs
   })
 
+  const { toast, toastError } = useToast()
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -52,32 +54,32 @@ export default function NewUserPage() {
     { companyId: 4, companyName: "LATAM Airlines", role: "operator", assigned: false },
   ])
 
-  const createUser = api.user.create.useMutation();
+  const createUser = api.user.create.useMutation()
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (formData.password !== formData.confirmPassword) {
-      alert("As senhas não coincidem!");
-      return;
+      alert("As senhas não coincidem!")
+      return
     }
 
     const assignedCompanies = companyAssignments
       .filter((c) => c.assigned)
-      .map((c) => ({ companyId: c.companyId, role: c.role }));
+      .map((c) => ({ companyId: c.companyId, role: c.role }))
 
     try {
       await createUser.mutateAsync({
         ...formData,
         companies: assignedCompanies,
-      });
+      })
 
-      alert("Usuário criado com sucesso!");
+      toast({ title: "Usuário criado com sucesso!" })
     } catch (err) {
-      console.error(err);
-      alert("Erro ao criar usuário!");
+      console.error(err)
+      toastError({ title: "Ocorreu um erro ao tentar criar um usuário" })
     }
-  };
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
@@ -86,21 +88,27 @@ export default function NewUserPage() {
     })
   }
 
-  const handleCompanyAssignment = (companyId: number, field: "assigned" | "role", value: boolean | string) => {
+  const handleCompanyAssignment = (
+    companyId: number,
+    field: "assigned" | "role",
+    value: boolean | string
+  ) => {
     setCompanyAssignments((prev) =>
-      prev.map((company) => (company.companyId === companyId ? { ...company, [field]: value } : company)),
+      prev.map((company) =>
+        company.companyId === companyId ? { ...company, [field]: value } : company
+      )
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-2 lg:px-8 py-4">
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto py-4">
         <form onSubmit={handleSubmit} className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Dados Pessoais</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <CardContent className="flex flex-col gap-6">
               <div className="md:col-span-2">
                 <Label htmlFor="fullName">Nome Completo *</Label>
                 <Input
@@ -136,16 +144,23 @@ export default function NewUserPage() {
               </div>
               <div>
                 <Label htmlFor="status">Status</Label>
-                <select
-                  id="status"
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                <Select
+                  value={formData.status.toString()}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      status: Number(value),
+                    }))
+                  }
                 >
-                  <option value={1}>Ativo</option>
-                  <option value={0}>Inativo</option>
-                </select>
+                  <SelectTrigger id="status" className="w-full">
+                    <SelectValue placeholder="Selecione o status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">Ativo</SelectItem>
+                    <SelectItem value="0">Inativo</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </CardContent>
           </Card>
@@ -154,7 +169,7 @@ export default function NewUserPage() {
             <CardHeader>
               <CardTitle>Configuração de Senha</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <CardContent className="flex flex-col gap-6">
               <div>
                 <Label htmlFor="password">Senha *</Label>
                 <div className="relative">
@@ -197,7 +212,11 @@ export default function NewUserPage() {
                     className="absolute right-0 top-0 h-full px-3"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
-                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
               </div>
@@ -211,7 +230,10 @@ export default function NewUserPage() {
             <CardContent>
               <div className="space-y-4">
                 {companyAssignments.map((company) => (
-                  <div key={company.companyId} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div
+                    key={company.companyId}
+                    className="flex items-center justify-between p-1 border rounded-lg"
+                  >
                     <div className="flex items-center space-x-3">
                       <Checkbox
                         id={`company-${company.companyId}`}
@@ -229,16 +251,21 @@ export default function NewUserPage() {
                         <Label htmlFor={`role-${company.companyId}`} className="text-sm">
                           Função:
                         </Label>
-                        <select
-                          id={`role-${company.companyId}`}
+                        <Select
                           value={company.role}
-                          onChange={(e) => handleCompanyAssignment(company.companyId, "role", e.target.value)}
-                          className="px-2 py-1 border border-gray-300 rounded text-sm"
+                          onValueChange={(value) =>
+                            handleCompanyAssignment(company.companyId, "role", value)
+                          }
                         >
-                          <option value="admin">Administrador</option>
-                          <option value="operator">Operador</option>
-                          <option value="viewer">Visualizador</option>
-                        </select>
+                          <SelectTrigger id={`role-${company.companyId}`} className="w-full">
+                            <SelectValue placeholder="Selecione a função" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="admin">Administrador</SelectItem>
+                            <SelectItem value="operator">Operador</SelectItem>
+                            <SelectItem value="viewer">Visualizador</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
                     )}
                   </div>
@@ -248,8 +275,8 @@ export default function NewUserPage() {
           </Card>
 
           <div className="flex justify-end gap-4">
-            <Link href="/admin/usuarios">
-              <Button 
+            <Link href="/admin/user">
+              <Button
                 variant="outline"
                 className="text-red-600 hover:text-red-700 hover:bg-red-300 border-red-300 hover:border-red-400 transition-colors"
               >

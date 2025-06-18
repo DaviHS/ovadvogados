@@ -75,4 +75,5 @@ export interface HandlingData {
   representativeName: string
   representativeId: string
   generalNotes: string
+  damagePhotos?: File[]
 }

@@ -21,7 +21,7 @@ export default function CargoHoldInspection({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>🔍 Inspeção interna do porão</CardTitle>
+        <CardTitle>🔍 9. Inspeção interna do porão</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">

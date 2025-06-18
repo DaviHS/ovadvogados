@@ -1,6 +1,6 @@
 "use client"
 
-import { ChevronsUpDown, LogOut } from "lucide-react"
+import { ChevronsUpDown, Users, Building2, Link as LinkIcon } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar"
-import { logoutAndClearFilters } from "@/lib/auth"
+import Link from "next/link"
 
 export function NavUser({
   user,
@@ -23,10 +23,6 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
-
-  const handleLogout = async () => {
-    await logoutAndClearFilters();
-  };
 
   return (
     <SidebarMenu>
@@ -58,15 +54,33 @@ export function NavUser({
                 </div>
               </div>
             </DropdownMenuLabel>
+
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="hover:bg-red-300 text-foreground" onClick={handleLogout}>
-              <LogOut/>
-              Sair
-            </DropdownMenuItem>
+
+            <DropdownMenuGroup>
+              <Link href="/admin/users" passHref>
+                <DropdownMenuItem className="cursor-pointer">
+                  <Users className="mr-2 h-4 w-4" />
+                  Usuários
+                </DropdownMenuItem>
+              </Link>
+              <Link href="/admin/companies" passHref>
+                <DropdownMenuItem className="cursor-pointer">
+                  <Building2 className="mr-2 h-4 w-4" />
+                  Empresas
+                </DropdownMenuItem>
+              </Link>
+              <Link href="/admin/user-company" passHref>
+                <DropdownMenuItem className="cursor-pointer">
+                  <LinkIcon className="mr-2 h-4 w-4" />
+                  Vínculos
+                </DropdownMenuItem>
+              </Link>
+            </DropdownMenuGroup>
+
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
   )
 }
-

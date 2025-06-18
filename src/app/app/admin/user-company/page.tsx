@@ -1,12 +1,24 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
+import Link from "next/link"
+import { Search, Plus, Edit, Trash2, Users, Building2 } from "lucide-react"
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Search, Plus, Edit, Trash2, Users, Building2 } from "lucide-react"
-import Link from "next/link"
+
+import { getNumberStatusColor, getRoleColor, getRoleText, getStatusText } from "@/lib"
+import { usePageInfo } from "@/hooks/use-page-info"
 
 interface UserCompany {
   id: number
@@ -21,7 +33,20 @@ interface UserCompany {
   endDate?: string
 }
 
-export default function UserCompanies() {
+export default function UserCompanyPage() {
+  const breadcrumbs = useMemo(
+    () => [
+      { label: "RampSync", href: "/app" },
+      { label: "Vínculo Trabalhista" },
+    ],
+    []
+  )
+
+  usePageInfo({
+    title: "Gestão de vínculos Trabalhista",
+    breadcrumbs,
+  })
+
   const [searchTerm, setSearchTerm] = useState("")
   const [roleFilter, setRoleFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
@@ -84,60 +109,17 @@ export default function UserCompanies() {
     return matchesSearch && matchesRole && matchesStatus
   })
 
-  const getStatusColor = (status: number) => {
-    return status === 1 ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-  }
-
-  const getStatusText = (status: number) => {
-    return status === 1 ? "Ativo" : "Inativo"
-  }
-
-  const getRoleColor = (role: string) => {
-    switch (role) {
-      case "admin":
-        return "bg-purple-100 text-purple-800"
-      case "operator":
-        return "bg-blue-100 text-blue-800"
-      case "viewer":
-        return "bg-gray-100 text-gray-800"
-      default:
-        return "bg-gray-100 text-gray-800"
-    }
-  }
-
-  const getRoleText = (role: string) => {
-    switch (role) {
-      case "admin":
-        return "Administrador"
-      case "operator":
-        return "Operador"
-      case "viewer":
-        return "Visualizador"
-      default:
-        return role
-    }
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Usuários x Empresas</h1>
-              <p className="text-gray-600">Gerencie as relações entre usuários e empresas</p>
-            </div>
-            <Link href="/admin/usuarios-empresas/nova">
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Nova Relação
-              </Button>
-            </Link>
-          </div>
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        <div className="pb-4 flex justify-end">
+          <Link href="/admin/user-company/new">
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Novo Vínculo
+            </Button>
+          </Link>
         </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -148,46 +130,54 @@ export default function UserCompanies() {
               className="pl-10"
             />
           </div>
-          <select
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">Todas as Funções</option>
-            <option value="admin">Administrador</option>
-            <option value="operator">Operador</option>
-            <option value="viewer">Visualizador</option>
-          </select>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">Todos os Status</option>
-            <option value="1">Ativo</option>
-            <option value="0">Inativo</option>
-          </select>
+
+          <Select value={roleFilter} onValueChange={setRoleFilter}>
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Todas as Funções" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas as Funções</SelectItem>
+              <SelectItem value="admin">Administrador</SelectItem>
+              <SelectItem value="operator">Operador</SelectItem>
+              <SelectItem value="viewer">Visualizador</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full sm:w-[160px]">
+              <SelectValue placeholder="Todos os Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos os Status</SelectItem>
+              <SelectItem value="1">Ativo</SelectItem>
+              <SelectItem value="0">Inativo</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
-        <div className="grid gap-4">
+        <div className="grid grid-cols-1 gap-6 mb-8">
           {filteredUserCompanies.map((uc) => (
             <Card key={uc.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-4 mb-2">
-                      <div className="flex items-center gap-2">
-                        <Users className="h-5 w-5 text-gray-400" />
-                        <span className="font-semibold">{uc.userName}</span>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="flex-1 space-y-3">
+                    <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-gray-800">
+                      <div className="flex items-center gap-1">
+                        <Users className="h-4 w-4 text-gray-500" />
+                        {uc.userName}
                       </div>
                       <span className="text-gray-400">→</span>
-                      <div className="flex items-center gap-2">
-                        <Building2 className="h-5 w-5 text-gray-400" />
-                        <span className="font-semibold">{uc.companyName}</span>
+                      <div className="flex items-center gap-1">
+                        <Building2 className="h-4 w-4 text-gray-500" />
+                        {uc.companyName}
                       </div>
-                      <Badge className={getStatusColor(uc.status)}>{getStatusText(uc.status)}</Badge>
-                      <Badge className={getRoleColor(uc.role)}>{getRoleText(uc.role)}</Badge>
                     </div>
+
+                    <div className="flex flex-wrap gap-2 text-sm">
+                      <Badge className={getRoleColor(uc.role)}>{getRoleText(uc.role)}</Badge>
+                      <Badge className={getNumberStatusColor(uc.status)}>{getStatusText(uc.status)}</Badge>
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
                       <div>
                         <p className="font-medium">Email do Usuário</p>
@@ -203,13 +193,22 @@ export default function UserCompanies() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex gap-2 ml-4">
+
+                  <div className="flex flex-wrap gap-2 justify-end sm:justify-start">
                     <Link href={`/admin/usuarios-empresas/${uc.id}/editar`}>
-                      <Button variant="outline" size="sm">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-300 border-blue-300 hover:border-blue-400 transition-colors"
+                      >
                         <Edit className="h-4 w-4" />
                       </Button>
                     </Link>
-                    <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-300 border-red-300 hover:border-red-400 transition-colors"
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>

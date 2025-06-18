@@ -3,6 +3,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
 import { InspectionPoint } from "@/types/handling"
+import AircraftTopView from "@/assets/imagens/aircraft.svg"
 
 import Image from "next/image" 
 
@@ -27,7 +28,7 @@ export default function AircraftDiagram({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>✈️ Diagrama da Aeronave (vista superior)</CardTitle>
+        <CardTitle>✈️ 8. Diagrama da Aeronave (vista superior)</CardTitle>
       </CardHeader>
       <CardContent>
 
@@ -41,7 +42,7 @@ export default function AircraftDiagram({
 
         <div className="relative w-full max-w-[400px] max-sm:max-w-[280px] aspect-[1/1] border-2 border-gray-300 rounded-lg bg-gray-50 mb-6 mx-auto">
           <Image
-            src="/aircraft.svg"
+            src={AircraftTopView}
             alt="Diagrama da aeronave"
             fill
             className="object-contain rounded-lg"
