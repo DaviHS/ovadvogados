@@ -7,7 +7,7 @@ export default auth((request: NextRequest) => {
 
   const fullPath = request.nextUrl.pathname;
   const isAuth = !!(request as any).auth;
-  const isAuthRoute = /^\/(sign-in|sign-up)/.test(fullPath);
+  const isAuthRoute = /^\/(sign-in|forgot-password|reset-password)/.test(fullPath);
   const isRootRoute = fullPath === '/';
 
   if (isRootRoute) {

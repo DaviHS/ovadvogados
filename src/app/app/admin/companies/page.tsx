@@ -77,7 +77,11 @@ export default function CompaniesPage() {
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto">
-        <div className="pb-4 flex justify-end">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Empresas</h1>
+            <p className="text-gray-600">Gerencie empresas do sistema</p>
+          </div>
           <Link href="/admin/companies/new">
             <Button>
               <Plus className="h-4 w-4 mr-2" />

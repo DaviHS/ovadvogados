@@ -1,9 +1,22 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Plane, ClipboardCheck, Users, AlertTriangle } from "lucide-react"
 import Link from "next/link"
+import { usePageInfo } from "@/hooks/use-page-info"
+import { useMemo } from "react"
 
 export default function Handling() {
+  const breadcrumbs = useMemo(() => [ 
+    { label: "RampSync"}],
+  []);
+  
+  usePageInfo({
+    title: `Tela Início`,
+    breadcrumbs,
+  })
+
   const stats = [
     {
       title: "Atendimentos Hoje",
@@ -39,7 +52,7 @@ export default function Handling() {
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto py-4">
         <div className="flex justify-end mb-6">
-          <Link href="/walkarounds/novo">
+          <Link href="/walkarounds/new">
             <Button>Novo Atendimento/Inspeção</Button>
           </Link>
         </div>

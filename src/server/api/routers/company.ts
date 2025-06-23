@@ -8,7 +8,6 @@ export const companyRouter = createTRPCRouter({
     const allCompanies = await db.select().from(companies).orderBy(companies.createdAt)
     return allCompanies
   }),
-
   create: publicProcedure
     .input(companySchema)
     .mutation(async ({ input }) => {

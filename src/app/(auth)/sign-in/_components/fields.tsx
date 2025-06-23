@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 interface Props {
   email: string
@@ -14,6 +15,13 @@ export default function Fields({
   onEmailChange,
   onPasswordChange,
 }: Props) {
+  const router = useRouter()
+
+  const handleForgotPassword = (e: React.MouseEvent) => {
+    e.preventDefault()
+    router.push(`/forgot-password${email ? `?email=${encodeURIComponent(email)}` : ''}`)
+  }
+
   return (
     <>
       <div className="space-y-2">
@@ -35,7 +43,11 @@ export default function Fields({
           <label htmlFor="password" className="text-sm font-medium">
             Senha
           </label>
-          <Link href="#" className="text-sm text-primary hover:underline">
+          <Link 
+            href="/forgot-password" 
+            onClick={handleForgotPassword}
+            className="text-sm text-primary hover:underline"
+          >
             Esqueceu a senha?
           </Link>
         </div>

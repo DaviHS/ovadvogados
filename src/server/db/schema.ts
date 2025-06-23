@@ -7,7 +7,7 @@ export const createTable = pgTableCreator((name) => {return name;});
 export const users = createTable("users", (d) => ({
   userId: d.serial("user_id").primaryKey(),
   fullName: d.varchar("full_name", { length: 100 }).notNull(),
-  email: d.varchar("email", { length: 100 }),
+  email: d.varchar("email", { length: 100 }).notNull(),
   status: d.smallint().default(1),
   passwordHash: d.varchar("password_hash", { length: 100 }).notNull(),
   passwordCreatedAt: d.timestamp("password_created_at", { mode: "date", withTimezone: true }),
@@ -15,6 +15,8 @@ export const users = createTable("users", (d) => ({
   enrollmentNumber: d.varchar("enrollment_number", { length: 20 }),
   createdAt: d.timestamp("created_at", { mode: "date", withTimezone: true }).defaultNow(),
   updatedAt: d.timestamp("updated_at", { mode: "date", withTimezone: true }).defaultNow(),
+  resetToken: d.varchar("reset_token", { length: 100 }),
+  resetTokenExpires: d.timestamp("reset_token_expires", { mode: "date", withTimezone: true }).defaultNow(),
 }))
 
 export const companies = createTable("companies", (d) => ({
@@ -48,5 +50,38 @@ export const userCompanies = createTable("user_companies", (d) => ({
   startDate: d.timestamp("start_date", { mode: "string" }).defaultNow(),
   endDate: d.timestamp("end_date", { mode: "string" }),
   createdAt: d.timestamp("created_at", { mode: "string" }).defaultNow(),
-  updatedAt: d.timestamp("updated_at", { mode: "string" }).defaultNow(),
+  //updatedAt: d.timestamp("updated_at", { mode: "string" }).defaultNow(),
 }))
+
+export const permissions = createTable("permissions", (d) => ({
+  permissionId: d.serial("permission_id").primaryKey(),
+  name: d.varchar("name", { length: 100 }).notNull(),
+  description: d.text("description"),
+  resource: d.varchar("resource", { length: 100 }).notNull(),
+  action: d.varchar("action", { length: 50 }).notNull(),
+  createdAt: d.timestamp("created_at", { mode: "date", withTimezone: true }).defaultNow(),
+  updatedAt: d.timestamp("updated_at", { mode: "date", withTimezone: true }).defaultNow(),
+}));
+
+export const roles = createTable("roles", (d) => ({
+  roleId: d.serial("role_id").primaryKey(),
+  name: d.varchar("name", { length: 100 }).notNull().unique(),
+  description: d.text("description"),
+  createdAt: d.timestamp("created_at", { mode: "date", withTimezone: true }).defaultNow(),
+  updatedAt: d.timestamp("updated_at", { mode: "date", withTimezone: true }).defaultNow(),
+}));
+
+export const rolePermissions = createTable("role_permissions", (d) => ({
+  id: d.serial("id").primaryKey(),
+  roleId: d.integer("role_id").references(() => roles.roleId).notNull(),
+  permissionId: d.integer("permission_id").references(() => permissions.permissionId).notNull(),
+  createdAt: d.timestamp("created_at", { mode: "date", withTimezone: true }).defaultNow(),
+}));
+
+export const userRoles = createTable("user_roles", (d) => ({
+  id: d.serial("id").primaryKey(),
+  userId: d.integer("user_id").references(() => users.userId).notNull(),
+  roleId: d.integer("role_id").references(() => roles.roleId).notNull(),
+  companyId: d.integer("company_id").references(() => companies.companyId),
+  createdAt: d.timestamp("created_at", { mode: "date", withTimezone: true }).defaultNow(),
+}));

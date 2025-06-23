@@ -7,7 +7,7 @@ const noRedirectRoute = ["/api(.*)", "/trpc(.*)", "/admin"];
 const publicRoute = [
   "^/\\w{2}$",
   "/(\\w{2}/)?forgot-password(.*)",
-  "/(\\w{2}/)?recovery-password(.*)",
+  "/(\\w{2}/)?reset-password(.*)",
 ];
 
 export const isValidateRoute = (
