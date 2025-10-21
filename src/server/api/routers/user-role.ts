@@ -31,10 +31,7 @@ export const userRoleRouter = createTRPCRouter({
   }),
 
   assign: publicProcedure.input(userRoleSchema).mutation(async ({ input }) => {
-    const companyCondition = input.companyId != null
-      ? eq(userRoles.companyId, input.companyId)
-      : isNull(userRoles.companyId)
-
+    // companyId obrigatório, não aceita null
     const existing = await db
       .select()
       .from(userRoles)
@@ -42,13 +39,13 @@ export const userRoleRouter = createTRPCRouter({
         and(
           eq(userRoles.userId, input.userId),
           eq(userRoles.roleId, input.roleId),
-          companyCondition,
+          eq(userRoles.companyId, input.companyId),
         ),
       )
       .limit(1)
 
     if (existing.length > 0) {
-      throw new Error("Usuário já possui esta função")
+      throw new Error("Usuário já possui esta função nesta empresa")
     }
 
     const [userRole] = await db
@@ -56,7 +53,7 @@ export const userRoleRouter = createTRPCRouter({
       .values({
         userId: input.userId,
         roleId: input.roleId,
-        companyId: input.companyId ?? null,
+        companyId: input.companyId, // sempre definido
       })
       .returning()
 
@@ -64,17 +61,14 @@ export const userRoleRouter = createTRPCRouter({
   }),
 
   remove: publicProcedure.input(userRoleDeleteSchema).mutation(async ({ input }) => {
-    const companyCondition = input.companyId != null
-      ? eq(userRoles.companyId, input.companyId)
-      : isNull(userRoles.companyId)
-
+    // companyId obrigatório
     await db
       .delete(userRoles)
       .where(
         and(
           eq(userRoles.userId, input.userId),
           eq(userRoles.roleId, input.roleId),
-          companyCondition,
+          eq(userRoles.companyId, input.companyId),
         ),
       )
 
@@ -82,24 +76,17 @@ export const userRoleRouter = createTRPCRouter({
   }),
 
   bulkUpdate: publicProcedure.input(userRolesBulkUpdateSchema).mutation(async ({ input }) => {
+    // Apaga todos os roles do usuário (incluindo todos os company roles)
     await db.delete(userRoles).where(eq(userRoles.userId, input.userId))
 
     const rolesToInsert = []
-
-    for (const roleId of input.globalRoles) {
-      rolesToInsert.push({
-        userId: input.userId,
-        roleId,
-        companyId: null,
-      })
-    }
 
     for (const companyRole of input.companyRoles) {
       for (const roleId of companyRole.roles) {
         rolesToInsert.push({
           userId: input.userId,
           roleId,
-          companyId: companyRole.companyId,
+          companyId: companyRole.companyId, // obrigatório e sempre preenchido
         })
       }
     }

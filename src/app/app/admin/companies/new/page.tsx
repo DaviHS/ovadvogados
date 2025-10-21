@@ -38,7 +38,6 @@ export default function NewCompanyPage() {
   const createCompany = api.company.create.useMutation()
   const router = useRouter()
 
-
   const [formData, setFormData] = useState({
     companyName: "",
     cnpj: "",

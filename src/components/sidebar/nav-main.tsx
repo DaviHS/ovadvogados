@@ -13,7 +13,6 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
-import { usePermissions } from "@/hooks/use-permissions"
 
 export interface NavItem {
   title: string
@@ -33,32 +32,31 @@ export function NavMain({
 }: {
   items: NavItem[]
 }) {
-  const { hasPermission, hasAnyRole, hasRole, isAdmin } = usePermissions()
+  // const { hasPermission, hasAnyRole, hasRole, isAdmin } = usePermissions()
 
-  const checkAccess = (item: NavItem): boolean => {
-    // Se é admin, tem acesso a tudo
-    if (isAdmin()) return true
+  // const checkAccess = (item: NavItem): boolean => {
+  //   // Se é admin, tem acesso a tudo
+  //   if (isAdmin()) return true
 
-    // Se não tem configuração de permissão, permite acesso
-    if (!item.resource && !item.action && (!item.roles || item.roles.length === 0)) {
-      return true
-    }
+  //   // Se não tem configuração de permissão, permite acesso
+  //   if (!item.resource && !item.action && (!item.roles || item.roles.length === 0)) {
+  //     return true
+  //   }
 
-    const hasRequiredPermission = item.resource && item.action ? hasPermission(item.resource, item.action) : true
+  //   const hasRequiredPermission = item.resource && item.action ? hasPermission(item.resource, item.action) : true
 
-    const hasRequiredRole =
-      item.roles && item.roles.length > 0
-        ? item.requireAll
-          ? item.roles.every(hasRole)
-          : hasAnyRole(item.roles)
-        : true
+  //   const hasRequiredRole =
+  //     item.roles && item.roles.length > 0
+  //       ? item.requireAll
+  //         ? item.roles.every(hasRole)
+  //         : hasAnyRole(item.roles)
+  //       : true
 
-    return item.requireAll ? hasRequiredPermission && hasRequiredRole : hasRequiredPermission || hasRequiredRole
-  }
+  //   return item.requireAll ? hasRequiredPermission && hasRequiredRole : hasRequiredPermission || hasRequiredRole
+  // }
 
   const filterItems = (items: NavItem[]): NavItem[] => {
     return items
-      .filter(checkAccess)
       .map((item) => ({
         ...item,
         items: item.items ? filterItems(item.items) : undefined,

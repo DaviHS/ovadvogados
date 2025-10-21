@@ -6,7 +6,6 @@ export const userSchema = z.object({
   enrollmentNumber: z.string().min(1, "Matrícula é obrigatória"),
   password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
   status: z.number().default(1),
-  globalRoles: z.array(z.number()).default([]),
   companies: z
     .array(
       z.object({
@@ -23,7 +22,6 @@ export const userUpdateSchema = z.object({
   email: z.string().email("Email inválido"),
   enrollmentNumber: z.string().min(1, "Matrícula é obrigatória"),
   status: z.number().default(1),
-  globalRoles: z.array(z.number()).default([]),
   companies: z
     .array(
       z.object({

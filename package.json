@@ -19,6 +19,7 @@
   "dependencies": {
     "@auth/drizzle-adapter": "^1.9.1",
     "@ducanh2912/next-pwa": "^10.2.9",
+    "@fnando/cnpj": "^2.0.0",
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/sourcemap-codec": "^1.5.0",
     "@neondatabase/serverless": "^1.0.1",

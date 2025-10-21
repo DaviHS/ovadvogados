@@ -16,11 +16,11 @@ import {
 } from "@/components/ui/sidebar"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
-import { usePermissions } from "@/hooks/use-permissions"
+// import { usePermissions } from "@/hooks/use-permissions"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: session } = useSession()
-  const { isAdmin } = usePermissions()
+  // const { isAdmin } = usePermissions()
 
   const user = {
     name: session?.user.fullName || "Usuário",
@@ -117,7 +117,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">RampSync</span>
-                  <span className="truncate text-xs">{isAdmin() ? "Administrador" : "Sistema de Atendimentos"}</span>
                 </div>
               </Link>
             </SidebarMenuButton>

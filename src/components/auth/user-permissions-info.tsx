@@ -1,34 +1,34 @@
 "use client"
 
-import { usePermissions } from "@/hooks/use-permissions"
+// import { usePermissions } from "@/hooks/use-permissions"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Shield, Users, Building2 } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export function UserPermissionsInfo() {
-  const { permissions, roles, companies, isAdmin, isLoading } = usePermissions()
+  // const { permissions, roles, companies, isAdmin, isLoading } = usePermissions()
 
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[...Array(3)].map((_, i) => (
-          <Card key={i}>
-            <CardHeader>
-              <Skeleton className="h-6 w-24" />
-              <Skeleton className="h-4 w-32" />
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <Skeleton className="h-6 w-20" />
-                <Skeleton className="h-6 w-16" />
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    )
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+  //       {[...Array(3)].map((_, i) => (
+  //         <Card key={i}>
+  //           <CardHeader>
+  //             <Skeleton className="h-6 w-24" />
+  //             <Skeleton className="h-4 w-32" />
+  //           </CardHeader>
+  //           <CardContent>
+  //             <div className="space-y-2">
+  //               <Skeleton className="h-6 w-20" />
+  //               <Skeleton className="h-6 w-16" />
+  //             </div>
+  //           </CardContent>
+  //         </Card>
+  //       ))}
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -42,12 +42,7 @@ export function UserPermissionsInfo() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2">
-            {roles.map((role) => (
-              <Badge key={role} variant={isAdmin() ? "default" : "secondary"}>
-                {role}
-              </Badge>
-            ))}
-            {roles.length === 0 && <p className="text-sm text-muted-foreground">Nenhuma função atribuída</p>}
+
           </div>
         </CardContent>
       </Card>
@@ -62,18 +57,7 @@ export function UserPermissionsInfo() {
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            {companies.map((company) => (
-              <div key={company.companyId} className="flex items-center justify-between">
-                <span className="text-sm">{company.companyName}</span>
-                <Badge variant="outline">{company.role}</Badge>
-              </div>
-            ))}
-            {companies.length === 0 && isAdmin() && (
-              <p className="text-sm text-muted-foreground">Acesso a todas as empresas</p>
-            )}
-            {companies.length === 0 && !isAdmin() && (
-              <p className="text-sm text-muted-foreground">Nenhuma empresa atribuída</p>
-            )}
+
           </div>
         </CardContent>
       </Card>
@@ -88,16 +72,7 @@ export function UserPermissionsInfo() {
         </CardHeader>
         <CardContent>
           <div className="space-y-2 max-h-40 overflow-y-auto">
-            {permissions.map((permission, index) => (
-              <div key={index} className="flex items-center justify-between text-sm">
-                <span className="capitalize">{permission.resource}</span>
-                <Badge variant="outline" className="text-xs">
-                  {permission.action}
-                </Badge>
-              </div>
-            ))}
-            {permissions.length === 0 && <p className="text-sm text-muted-foreground">Nenhuma permissão específica</p>}
-          </div>
+           </div>
         </CardContent>
       </Card>
     </div>

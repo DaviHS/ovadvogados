@@ -7,33 +7,36 @@ import { z } from "zod"
 
 export const roleRouter = createTRPCRouter({
   list: publicProcedure.query(async () => {
-    const allRoles = await db.select().from(roles).orderBy(roles.name)
-    return allRoles
+    return await db.select().from(roles).orderBy(roles.name)
   }),
 
   listWithPermissions: publicProcedure.query(async () => {
     const rolesWithPermissions = await db
-    .select({
-      roleId: roles.roleId,
-      name: roles.name,
-      description: roles.description,
-      createdAt: roles.createdAt,
-      updatedAt: roles.updatedAt,
-      permission: permissions,
-    })
-    .from(roles)
-    .innerJoin(rolePermissions, eq(roles.roleId, rolePermissions.roleId))
-    .innerJoin(permissions, eq(rolePermissions.permissionId, permissions.permissionId))
-    .orderBy(roles.name)
+      .select({
+        roleId: roles.roleId,
+        name: roles.name,
+        description: roles.description,
+        createdAt: roles.createdAt,
+        updatedAt: roles.updatedAt,
+        permissionId: permissions.permissionId,
+        permissionName: permissions.name,
+        permissionDescription: permissions.description,
+        // adicione outros campos de permission que precisar
+      })
+      .from(roles)
+      .innerJoin(rolePermissions, eq(roles.roleId, rolePermissions.roleId))
+      .innerJoin(permissions, eq(rolePermissions.permissionId, permissions.permissionId))
+      .orderBy(roles.name)
 
-    // Agrupar permissões por role
     const groupedRoles = rolesWithPermissions.reduce((acc, row) => {
-      const existingRole = acc.find((r) => r.roleId === row.roleId)
+      let existingRole = acc.find((r) => r.roleId === row.roleId)
 
       if (existingRole) {
-        if (row.permission.permissionId) {
-          existingRole.permissions.push(row.permission)
-        }
+        existingRole.permissions.push({
+          permissionId: row.permissionId,
+          name: row.permissionName,
+          description: row.permissionDescription,
+        })
       } else {
         acc.push({
           roleId: row.roleId,
@@ -41,27 +44,30 @@ export const roleRouter = createTRPCRouter({
           description: row.description,
           createdAt: row.createdAt,
           updatedAt: row.updatedAt,
-          permissions: row.permission.permissionId ? [row.permission] : [],
+          permissions: [
+            {
+              permissionId: row.permissionId,
+              name: row.permissionName,
+              description: row.permissionDescription,
+            },
+          ],
         })
       }
 
       return acc
     }, [] as any[])
 
+
     return groupedRoles
   }),
 
-  getById: publicProcedure.input(z.object({ roleId: z.number() })).query(async ({ input }) => {
+  getById: publicProcedure.input(z.object({ roleId: z.number().int().positive() })).query(async ({ input }) => {
     const role = await db.select().from(roles).where(eq(roles.roleId, input.roleId)).limit(1)
 
-    if (!role[0]) {
-      throw new Error("Role não encontrada")
-    }
+    if (!role[0]) throw new Error("Role não encontrada")
 
     const rolePermissionsList = await db
-      .select({
-        permission: permissions,
-      })
+      .select({ permission: permissions })
       .from(rolePermissions)
       .innerJoin(permissions, eq(rolePermissions.permissionId, permissions.permissionId))
       .where(eq(rolePermissions.roleId, input.roleId))
@@ -81,13 +87,14 @@ export const roleRouter = createTRPCRouter({
       })
       .returning()
 
-    // Adicionar permissões válidas
-    const validPermissions = input.permissions?.filter((id) => id != null) ?? []
+    if (!role) throw new Error("Erro ao criar role")
+
+    const validPermissions = input.permissions.filter((id) => id != null)
 
     if (validPermissions.length > 0) {
       await db.insert(rolePermissions).values(
         validPermissions.map((permissionId) => ({
-          roleId: role!.roleId,
+          roleId: role.roleId,
           permissionId,
         })),
       )
@@ -107,43 +114,43 @@ export const roleRouter = createTRPCRouter({
       .where(eq(roles.roleId, input.roleId))
       .returning()
 
-    // Remover todas as permissões antigas
-    await db.delete(rolePermissions).where(eq(rolePermissions.roleId, input.roleId))
+    if (!role) throw new Error("Role não encontrada ou erro na atualização")
 
-    // Adicionar novas permissões válidas
-    const validPermissions = input.permissions?.filter((id) => id != null) ?? []
+    // Atualiza permissões somente se passado no input
+    if (input.permissions) {
+      await db.delete(rolePermissions).where(eq(rolePermissions.roleId, input.roleId))
 
-    if (validPermissions.length > 0) {
-      await db.insert(rolePermissions).values(
-        validPermissions.map((permissionId) => ({
-          roleId: input.roleId,
-          permissionId,
-        })),
-      )
+      const validPermissions = input.permissions.filter((id) => id != null)
+
+      if (validPermissions.length > 0) {
+        await db.insert(rolePermissions).values(
+          validPermissions.map((permissionId) => ({
+            roleId: input.roleId,
+            permissionId,
+          })),
+        )
+      }
     }
 
     return role
   }),
 
-
   delete: publicProcedure.input(roleDeleteSchema).mutation(async ({ input }) => {
-    // Verificar se há usuários com esta role
     const usersWithRole = await db.select().from(userRoles).where(eq(userRoles.roleId, input.roleId)).limit(1)
 
     if (usersWithRole.length > 0) {
       throw new Error("Não é possível excluir uma função que possui usuários associados")
     }
 
-    // Remover permissões da role
     await db.delete(rolePermissions).where(eq(rolePermissions.roleId, input.roleId))
+    const deleted = await db.delete(roles).where(eq(roles.roleId, input.roleId)).returning()
 
-    // Remover a role
-    await db.delete(roles).where(eq(roles.roleId, input.roleId))
+    if (!deleted.length) throw new Error("Role não encontrada para exclusão")
 
     return { success: true }
   }),
 
-  getUserCount: publicProcedure.input(z.object({ roleId: z.number() })).query(async ({ input }) => {
+  getUserCount: publicProcedure.input(z.object({ roleId: z.number().int().positive() })).query(async ({ input }) => {
     const count = await db
       .select({ count: sql<number>`count(*)` })
       .from(userRoles)

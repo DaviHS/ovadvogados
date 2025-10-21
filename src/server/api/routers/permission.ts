@@ -7,8 +7,7 @@ import { z } from "zod"
 
 export const permissionRouter = createTRPCRouter({
   list: publicProcedure.query(async () => {
-    const allPermissions = await db.select().from(permissions).orderBy(permissions.resource, permissions.action)
-    return allPermissions
+    return await db.select().from(permissions).orderBy(permissions.resource, permissions.action)
   }),
 
   create: publicProcedure.input(permissionSchema).mutation(async ({ input }) => {
@@ -38,26 +37,26 @@ export const permissionRouter = createTRPCRouter({
       .where(eq(permissions.permissionId, input.permissionId))
       .returning()
 
+    if (!permission) throw new Error("Permissão não encontrada para atualização")
+
     return permission
   }),
 
   delete: publicProcedure.input(permissionDeleteSchema).mutation(async ({ input }) => {
-    // Primeiro, remove todas as associações com roles
     await db.delete(rolePermissions).where(eq(rolePermissions.permissionId, input.permissionId))
 
-    // Depois remove a permissão
-    await db.delete(permissions).where(eq(permissions.permissionId, input.permissionId))
+    const deleted = await db.delete(permissions).where(eq(permissions.permissionId, input.permissionId)).returning()
+
+    if (!deleted.length) throw new Error("Permissão não encontrada para exclusão")
 
     return { success: true }
   }),
 
   getByResource: publicProcedure.input(z.object({ resource: z.string() })).query(async ({ input }) => {
-    const resourcePermissions = await db
+    return await db
       .select()
       .from(permissions)
       .where(eq(permissions.resource, input.resource))
       .orderBy(permissions.action)
-
-    return resourcePermissions
   }),
 })

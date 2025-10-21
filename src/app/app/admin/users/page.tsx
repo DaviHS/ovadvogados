@@ -34,8 +34,11 @@ export default function UsersPage() {
 
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
+  
+  const { data: users, isLoading, refetch } = api.user.getAll.useQuery(undefined, {
+    refetchOnMount: true,
+  })
 
-  const { data: users, isLoading, refetch } = api.user.listWithRoles.useQuery()
   const deleteUser = api.user.delete.useMutation({
     onSuccess: () => {
       toast.success("Usuário excluído com sucesso!")
@@ -133,7 +136,7 @@ export default function UsersPage() {
                   <div className="flex-1 space-y-4">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                       <h3 className="text-lg font-semibold truncate">{user.fullName}</h3>
-                      <Badge className={getNumberStatusColor(user.status!)}>{getStatusText(user.status)}</Badge>
+                      <Badge className={getNumberStatusColor(user.status!)}>{getStatusText(user!.status!)}</Badge>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-700">

@@ -3,18 +3,17 @@ import { z } from "zod"
 export const userRoleSchema = z.object({
   userId: z.number(),
   roleId: z.number(),
-  companyId: z.number().optional(), // null para roles globais
+  companyId: z.number(),
 })
 
 export const userRoleDeleteSchema = z.object({
   userId: z.number(),
   roleId: z.number(),
-  companyId: z.number().optional(),
+  companyId: z.number(),
 })
 
 export const userRolesBulkUpdateSchema = z.object({
   userId: z.number(),
-  globalRoles: z.array(z.number()).default([]),
   companyRoles: z
     .array(
       z.object({
