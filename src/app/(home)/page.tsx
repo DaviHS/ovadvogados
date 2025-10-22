@@ -1,11 +1,22 @@
 "use client";
 
-import { Body } from "./_components/body";
+import { 
+  Benefits, 
+  CtaFinal, 
+  Footer, 
+  Hero, 
+  Problems, 
+  Solutions } from "./_components";
 
 const Home = () => {
   return (
     <>
-      <Body />
+           <Hero/>
+           <Problems/>
+           <Solutions/>
+           <Benefits/>
+           <CtaFinal/>
+           <Footer/>
     </>
   );
 };

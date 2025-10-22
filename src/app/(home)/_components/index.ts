@@ -5,5 +5,3 @@ export { default as Hero } from "./hero";
 export { default as Problems } from "./problems";
 export { default as Header } from "./header";
 export { default as Solutions} from "./solutions";
-export { default as Validations } from "./validations";
-

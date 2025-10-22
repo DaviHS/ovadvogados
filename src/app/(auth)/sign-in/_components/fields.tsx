@@ -1,12 +1,16 @@
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { Eye, EyeOff } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 interface Props {
   email: string
   password: string
   onEmailChange: (value: string) => void
   onPasswordChange: (value: string) => void
+  showPassword: boolean
+  onToggleShowPassword: () => void
 }
 
 export default function Fields({
@@ -14,13 +18,10 @@ export default function Fields({
   password,
   onEmailChange,
   onPasswordChange,
+  showPassword,
+  onToggleShowPassword,
 }: Props) {
   const router = useRouter()
-
-  const handleForgotPassword = (e: React.MouseEvent) => {
-    e.preventDefault()
-    router.push(`/forgot-password${email ? `?email=${encodeURIComponent(email)}` : ''}`)
-  }
 
   return (
     <>
@@ -39,25 +40,28 @@ export default function Fields({
       </div>
 
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <label htmlFor="password" className="text-sm font-medium">
-            Senha
-          </label>
-          <Link 
-            href="/forgot-password" 
-            onClick={handleForgotPassword}
-            className="text-sm text-primary hover:underline"
+        <label htmlFor="password" className="text-sm font-medium">
+          Senha
+        </label>
+        <div className="relative">
+          <Input
+            id="password"
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={(e) => onPasswordChange(e.target.value)}
+            required
+            className="pr-10"
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={onToggleShowPassword}
+            className="absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground hover:text-foreground"
           >
-            Esqueceu a senha?
-          </Link>
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </Button>
         </div>
-        <Input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => onPasswordChange(e.target.value)}
-          required
-        />
       </div>
     </>
   )

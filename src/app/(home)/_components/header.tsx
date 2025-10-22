@@ -15,7 +15,6 @@ export default function Header() {
     { href: "#inicio", label: "Início" },
     { href: "#solucoes", label: "Soluções" },
     { href: "#beneficios", label: "Benefícios" },
-    { href: "#validacoes", label: "Validações" },
     { href: "#contato", label: "Contato" },
   ]
 
