@@ -49,7 +49,7 @@ export default function Form() {
 
   const handleSupportClick = () => {
     const phoneNumber = "5511967701575"
-    const message = "Olá! Preciso de ajuda com o acesso da Igreja Central - Vida com Propósito."
+    const message = "Olá! Preciso de ajuda com o acesso ao RampSync."
     const encodedMessage = encodeURIComponent(message)
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`
     
