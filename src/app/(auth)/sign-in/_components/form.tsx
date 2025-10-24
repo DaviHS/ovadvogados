@@ -7,7 +7,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import Fields from "./fields"
-import { Lock } from "lucide-react"
+import { Lock, Plane } from "lucide-react"
 import { toast } from "sonner"
 
 export default function Form() {
@@ -60,7 +60,7 @@ export default function Form() {
     <Card className="w-full">
       <CardHeader className="text-center">
         <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-          <Lock className="h-8 w-8 text-primary-foreground" />
+          <Plane className="h-8 w-8 text-primary-foreground" />
         </div>
         <CardTitle className="text-2xl font-bold text-center text-primary">Área do Membro</CardTitle>
         <CardDescription className="text-center">

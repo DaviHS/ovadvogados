@@ -42,64 +42,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       action: "read",
     },
     // Menu Administrativo - apenas para admins
-    {
-      icon: Shield,
-      title: "Administração",
-      url: "#",
-      roles: ["super_admin", "admin"],
-      items: [
-        {
-          title: "Dashboard Admin",
-          url: "/admin",
-          roles: ["super_admin", "admin"],
-        },
-        {
-          title: "Usuários",
-          url: "/admin/users",
-          resource: "users",
-          action: "read",
-        },
-        {
-          title: "Empresas",
-          url: "/admin/companies",
-          resource: "companies",
-          action: "read",
-        },
-        {
-          title: "Vínculos",
-          url: "/admin/user-company",
-          resource: "users",
-          action: "read",
-        },
-        {
-          title: "Funções e Permissões",
-          url: "/admin/roles",
-          resource: "settings",
-          action: "update",
-        },
-        {
-          title: "Relatórios",
-          url: "/admin/reports",
-          resource: "reports",
-          action: "read",
-        },
-        {
-          title: "Configurações",
-          url: "/admin/settings",
-          resource: "settings",
-          action: "read",
-        },
-      ],
-    },
-    // Menu para supervisores
-    {
-      icon: BarChart3,
-      title: "Relatórios",
-      url: `/app/reports`,
-      roles: ["supervisor", "admin", "super_admin"],
-      resource: "reports",
-      action: "read",
-    },
   ]
 
   return (
