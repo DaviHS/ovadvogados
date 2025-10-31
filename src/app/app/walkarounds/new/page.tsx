@@ -18,7 +18,7 @@ import {
   Cancellation,
   Signature,
   GeneralNotes,
-} from "@/components/form/walkarounds"
+} from "../_components"
 import { 
   CargoHoldItem, 
   EquipmentUsed, 
@@ -26,6 +26,8 @@ import {
   InspectionPoint 
 } from "@/types/handling"
 import { usePageInfo } from "@/hooks/use-page-info"
+import { useRouter } from "next/navigation"
+import { api } from "@/lib/api"
 
 const initialFormData: HandlingData = {
   flightNumber: "",
@@ -82,6 +84,7 @@ const initialFormData: HandlingData = {
 }
 
 export default function NewWalkaroundPage() {
+  const router = useRouter()
   const breadcrumbs = useMemo(() => [ 
     { label: "RampSync", href: "/app" }, 
     { label: "Walkarounds", href: "/walkarounds" },
@@ -93,6 +96,9 @@ export default function NewWalkaroundPage() {
     breadcrumbs
   })
     
+
+  const createHandling = api.handling.create.useMutation();
+
   const [formData, setFormData] = useState<HandlingData>(initialFormData)
   const [equipmentList, setEquipmentList] = useState<EquipmentUsed[]>([])
 
@@ -130,44 +136,54 @@ export default function NewWalkaroundPage() {
     { id: "redes", name: "Redes", checked: false, notes: "" },
   ])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Complete handling data:", {
-      formData,
-      equipmentList,
-      inspectionPoints,
-      cargoHoldItems,
-    })
-    alert("Handling and inspection recorded successfully!")
+    setIsSubmitting(true)
+
+    try {
+      const processedData = {
+        ...formData,
+        equipmentList,
+        inspectionPoints,
+        cargoHoldItems,
+        damagePhotos: formData.damagePhotos ? [] : undefined
+      }
+
+      await createHandling.mutateAsync(processedData)
+      
+      // Redirecionar para a lista de walkarounds
+      router.push("/walkarounds")
+      // Você pode usar toast em vez de alert
+      // toast.success("Walkaround criado com sucesso!")
+      
+    } catch (error) {
+      console.error("Erro ao criar walkaround:", error)
+      // toast.error("Erro ao criar walkaround")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target
+    const keys = name.split(".")
 
-    if (name.includes(".")) {
-      const [section, field] = name.split(".") as [keyof HandlingData, string]
-      
-      setFormData((prev) => {
-        const sectionData = prev[section]
-        if (typeof sectionData === "object" && sectionData !== null) {
-          return {
-            ...prev,
-            [section]: {
-              ...sectionData,
-              [field]: value,
-            },
-          }
-        }
-        return prev
-      })
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }))
-    }
+    setFormData((prev) => {
+      const newData: any = { ...prev }
+      let current = newData
+
+      for (let i = 0; i < keys.length - 1; i++) {
+        if (!current[keys[i]!]) current[keys[i]!] = {}
+        current = current[keys[i]!]
+      }
+
+      current[keys[keys.length - 1]!] = value
+      return newData
+    })
   }
 
   return (

@@ -21,6 +21,7 @@ export const userUpdateSchema = z.object({
   fullName: z.string().min(1, "Nome é obrigatório"),
   email: z.string().email("Email inválido"),
   enrollmentNumber: z.string().min(1, "Matrícula é obrigatória"),
+  password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
   status: z.number().default(1),
   companies: z
     .array(

@@ -1,6 +1,5 @@
 import { pgTable  } from "drizzle-orm/pg-core";
 
-
 // USERS
 export const users = pgTable("users", (d) => ({
   userId: d.serial("user_id").primaryKey(),
@@ -69,4 +68,64 @@ export const userRoles = pgTable("user_roles", (d) => ({
   companyId: d.integer("company_id").references(() => companies.companyId).notNull(),
   roleId: d.integer("role_id").references(() => roles.roleId).notNull(),
   createdAt: d.timestamp("created_at", { mode: "date", withTimezone: true }).defaultNow(),
+}));
+
+// WALKAROUNDS / HANDLINGS
+export const handlings = pgTable("handlings", (d) => ({
+  handlingId: d.serial("handling_id").primaryKey(),
+  companyId: d.integer("company_id").references(() => companies.companyId).notNull(),
+  userId: d.integer("user_id").references(() => users.userId).notNull(),
+  
+  // Flight Identification
+  flightNumber: d.varchar("flight_number", { length: 20 }).notNull(),
+  aircraftRegistration: d.varchar("aircraft_registration", { length: 20 }).notNull(),
+  timeCompleted: d.varchar("time_completed", { length: 10 }).notNull(),
+  date: d.date("date").notNull(),
+  teamLeader: d.varchar("team_leader", { length: 100 }).notNull(),
+  collectionInfo: d.text("collection_info"),
+  client: d.varchar("client", { length: 100 }).notNull(),
+  flightType: d.varchar("flight_type", { length: 20 }).notNull(), // 'arrival' or 'departure'
+  base: d.varchar("base", { length: 10 }).notNull(),
+  
+  // Flight Data
+  arrivalFlight: d.varchar("arrival_flight", { length: 20 }),
+  departureFlight: d.varchar("departure_flight", { length: 20 }),
+  aircraftModel: d.varchar("aircraft_model", { length: 50 }),
+  registration: d.varchar("registration", { length: 50 }),
+  chocksOn: d.varchar("chocks_on", { length: 10 }),
+  releaseTime: d.varchar("release_time", { length: 10 }),
+  origin: d.varchar("origin", { length: 10 }),
+  destination: d.varchar("destination", { length: 10 }),
+  parkingPosition: d.varchar("parking_position", { length: 20 }),
+  
+  // JSON fields for complex data
+  disembarkation: d.json("disembarkation"),
+  boarding: d.json("boarding"),
+  personnel: d.json("personnel"),
+  equipmentList: d.json("equipment_list"),
+  inspectionPoints: d.json("inspection_points"),
+  cargoHoldItems: d.json("cargo_hold_items"),
+  
+  // Damage Report
+  damageDetected: d.boolean("damage_detected").default(false),
+  damageDescription: d.text("damage_description"),
+  damagePhotos: d.json("damage_photos"), // Array of photo URLs
+  
+  // Cancellation
+  cancellationRequester: d.varchar("cancellation_requester", { length: 100 }),
+  cancellationReason: d.text("cancellation_reason"),
+  
+  // Signature
+  responsibleName: d.varchar("responsible_name", { length: 100 }),
+  responsibleId: d.varchar("responsible_id", { length: 50 }),
+  representativeName: d.varchar("representative_name", { length: 100 }),
+  representativeId: d.varchar("representative_id", { length: 50 }),
+  
+  // General Notes
+  generalNotes: d.text("general_notes"),
+  
+  // Timestamps
+  createdAt: d.timestamp("created_at", { mode: "date", withTimezone: true }).defaultNow(),
+  updatedAt: d.timestamp("updated_at", { mode: "date", withTimezone: true }).defaultNow(),
+  status: d.smallint("status").default(1), // 1=active, 0=inactive
 }));
