@@ -94,8 +94,8 @@ export const handlings = pgTable("handlings", (d) => ({
   registration: d.varchar("registration", { length: 50 }),
   chocksOn: d.varchar("chocks_on", { length: 10 }),
   releaseTime: d.varchar("release_time", { length: 10 }),
-  origin: d.varchar("origin", { length: 10 }),
-  destination: d.varchar("destination", { length: 10 }),
+  origin: d.varchar("origin", { length: 100 }),
+  destination: d.varchar("destination", { length: 100 }),
   parkingPosition: d.varchar("parking_position", { length: 20 }),
   
   // JSON fields for complex data

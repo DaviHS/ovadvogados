@@ -83,7 +83,7 @@ export const handlingSchema = z.object({
   flightNumber: z.string().min(1, "Número do voo é obrigatório"),
   aircraftRegistration: z.string().min(1, "Registro da aeronave é obrigatório"),
   timeCompleted: z.string().default("00:00"),
-  date: z.string().default(() => new Date().toISOString().split('T')[0]),
+  date: z.string().default(() => new Date().toISOString().split("T")[0] ?? ""),
   teamLeader: z.string().min(1, "Líder da equipe é obrigatório"),
   client: z.string().min(1, "Cliente é obrigatório"),
   flightType: z.enum(["arrival", "departure"]).default("arrival"),

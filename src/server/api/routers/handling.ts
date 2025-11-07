@@ -2,27 +2,26 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { handlings } from "@/server/db/schema";
 import { handlingSchema } from "@/validators/handling";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, sql, ilike, or } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 export const handlingRouter = createTRPCRouter({
-create: protectedProcedure
+  create: protectedProcedure
     .input(handlingSchema)
     .mutation(async ({ ctx, input }) => {
       try {
         // Garantir que temos company_id e user_id do contexto
 
-
         // Preparar os dados para inserção
         const handlingData = {
           ...input,
           companyId:  1, // Use o companyId do usuário ou um padrão
-          userId: 0,
+          userId: 27,
           
           flightNumber: input.flightNumber || "N/A",
           aircraftRegistration: input.aircraftRegistration || "N/A",
           timeCompleted: input.timeCompleted || "00:00",
-          date: input.date || new Date().toISOString().split('T')[0], // Data atual
+          date: input.date, // Data atual
           teamLeader: input.teamLeader || "N/A",
           client: input.client || "N/A",
           flightType: input.flightType || "arrival",
@@ -86,46 +85,53 @@ create: protectedProcedure
     }),
 
   list: protectedProcedure
-    .input(z.object({
-      page: z.number().default(1),
-      limit: z.number().default(10),
-      search: z.string().optional(),
-    }))
-    .query(async ({ ctx, input }) => {
-      const { page, limit, search } = input;
-      const offset = (page - 1) * limit;
+  .input(z.object({
+    page: z.number().default(1),
+    limit: z.number().default(10),
+    search: z.string().optional(),
+  }))
+  .query(async ({ ctx, input }) => {
+    const { page, limit, search } = input;
+    const offset = (page - 1) * limit;
 
-      let whereCondition = eq(handlings.companyId, 0);
-      
-      if (search) {
-        whereCondition = and(
-          whereCondition,
-          // Add search conditions as needed
-        ) as any;
-      }
+    const companyId =  1;
+    
+    let whereCondition = eq(handlings.companyId, companyId);
+    
+    if (search) {
+      whereCondition = and(
+        whereCondition,
+        or(
+          ilike(handlings.flightNumber, `%${search}%`),
+          ilike(handlings.aircraftRegistration, `%${search}%`),
+          ilike(handlings.client, `%${search}%`)
+        )
+      ) as any;
+    }
 
-      const [items, [total]] = await Promise.all([
-        ctx.db
-          .select()
-          .from(handlings)
-          .where(whereCondition)
-          .orderBy(desc(handlings.createdAt))
-          .limit(limit)
-          .offset(offset),
-        ctx.db
-          .select({ count: ctx.db.$count(handlings.handlingId) })
-          .from(handlings)
-          .where(whereCondition),
-      ]);
+    const items = await ctx.db
+      .select()
+      .from(handlings)
+      .where(whereCondition)
+      .orderBy(desc(handlings.createdAt))
+      .limit(limit)
+      .offset(offset);
 
-      return {
-        items,
-        total: total?.count || 0,
-        page,
-        limit,
-        totalPages: Math.ceil((total?.count || 0) / limit),
-      };
-    }),
+    const countResult = await ctx.db
+      .select({ count: sql<number>`count(*)` })
+      .from(handlings)
+      .where(whereCondition);
+
+    const total = countResult[0]?.count || 0;
+
+    return {
+      items,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }),
 
   getById: protectedProcedure
     .input(z.object({ handlingId: z.number() }))
@@ -136,7 +142,7 @@ create: protectedProcedure
         .where(
           and(
             eq(handlings.handlingId, input.handlingId),
-            eq(handlings.companyId, 0)
+            eq(handlings.companyId, 1)
           )
         );
 
