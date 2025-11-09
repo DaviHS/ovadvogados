@@ -2,21 +2,35 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plane, ClipboardCheck, Users, AlertTriangle, Loader2 } from "lucide-react"
+import { 
+  Plane, 
+  ClipboardCheck, 
+  Users, 
+  AlertTriangle, 
+  FileText, 
+  Settings,
+  BarChart3,
+  Shield,
+  Calendar,
+  Clock,
+  ArrowRight
+} from "lucide-react"
 import Link from "next/link"
 import { usePageInfo } from "@/hooks/use-page-info"
 import { useMemo } from "react"
 import { api } from "@/lib/api"
-import { format, isToday, isThisMonth } from "date-fns"
+import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { LoadingState } from "@/components/ui/loading-state"
+import { ErrorDisplay } from "@/components/ui/error-display"
 
-export default function Handling() {
+export default function Dashboard() {
   const breadcrumbs = useMemo(() => [ 
     { label: "RampSync" }
   ], []);
   
   usePageInfo({
-    title: `Tela Início`,
+    title: `Dashboard`,
     breadcrumbs,
   })
 
@@ -26,92 +40,58 @@ export default function Handling() {
     limit: 100,
   })
 
-  // Calcular estatísticas com base nos dados reais
+  // Calcular estatísticas
   const stats = useMemo(() => {
     if (!handlingsData?.items) {
       return [
         { title: "Atendimentos Hoje", value: "0", description: "Carregando...", icon: Users, color: "text-blue-600" },
         { title: "Atendimentos Concluídos", value: "0", description: "Total", icon: ClipboardCheck, color: "text-green-600" },
         { title: "Aeronaves Ativas", value: "0", description: "Últimos 7 dias", icon: Plane, color: "text-green-600" },
-        { title: "Alertas", value: "0", description: "Danos detectados", icon: AlertTriangle, color: "text-red-600" },
+        { title: "Alertas", value: "0", description: "Requer atenção", icon: AlertTriangle, color: "text-red-600" },
       ]
     }
 
     const items = handlingsData.items
-    const today = new Date()
     
-    // DEBUG: Log para verificar as datas
-    console.log("Datas dos atendimentos:", items.map(item => ({
-      id: item.handlingId,
-      date: item.date,
-      createdAt: item.createdAt,
-      isToday: item.createdAt ? isToday(new Date(item.createdAt)) : false
-    })))
-
-    // Atendimentos de hoje (baseado na criação)
-    const todayItems = items.filter(item => 
-      item.createdAt && isToday(new Date(item.createdAt))
-    ).length
-
-    // Atendimentos em andamento hoje
-    const inProgressToday = items.filter(item => 
-      item.createdAt && 
-      isToday(new Date(item.createdAt)) && 
-      item.status === 1
-    ).length
-
-    // Atendimentos concluídos (total)
+    // Estatísticas básicas
+    const todayItems = items.length // Para demo, mostra total
     const completedItems = items.filter(item => item.status === 2).length
-
-    // Aeronaves únicas dos últimos 7 dias
-    const lastWeek = new Date()
-    lastWeek.setDate(lastWeek.getDate() - 7)
-    const uniqueAircrafts = new Set(
-      items
-        .filter(item => 
-          item.createdAt && 
-          new Date(item.createdAt) >= lastWeek
-        )
-        .map(item => item.aircraftRegistration)
-        .filter(Boolean)
-    ).size
-
-    // Alertas - atendimentos com danos detectados
+    const uniqueAircrafts = new Set(items.map(item => item.aircraftRegistration).filter(Boolean)).size
     const alertsCount = items.filter(item => item.damageDetected).length
 
     return [
       {
-        title: "Atendimentos Hoje",
+        title: "Total de Atendimentos",
         value: todayItems.toString(),
-        description: `${inProgressToday} em andamento`,
+        description: `${items.filter(item => item.status === 1).length} em andamento`,
         icon: Users,
         color: "text-blue-600",
       },
       {
-        title: "Atendimentos Concluídos",
+        title: "Concluídos",
         value: completedItems.toString(),
-        description: "Total",
+        description: "Atendimentos finalizados",
         icon: ClipboardCheck,
         color: "text-green-600",
       },
       {
-        title: "Aeronaves Ativas",
+        title: "Aeronaves",
         value: uniqueAircrafts.toString(),
-        description: "Últimos 7 dias",
+        description: "Aeronaves atendidas",
         icon: Plane,
         color: "text-green-600",
       },
       {
         title: "Alertas",
         value: alertsCount.toString(),
-        description: "Danos detectados",
+        description: "Incidentes reportados",
         icon: AlertTriangle,
         color: "text-red-600",
       },
     ]
   }, [handlingsData])
 
-  // Atendimentos recentes (últimos 3)
+  // Atendimentos recentes
   const recentHandlings = useMemo(() => {
     if (!handlingsData?.items) return []
 
@@ -137,64 +117,98 @@ export default function Handling() {
       })
   }, [handlingsData])
 
-  // Função para mapear status para cores
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Concluído':
-        return "bg-green-100 text-green-800"
-      case 'Em andamento':
-        return "bg-blue-100 text-blue-800"
-      case 'Pendente':
-        return "bg-yellow-100 text-yellow-800"
-      default:
-        return "bg-gray-100 text-gray-800"
+  // Módulos do sistema
+  const modules = [
+    {
+      title: "Walkarounds",
+      description: "Inspeções e atendimentos de aeronaves",
+      icon: ClipboardCheck,
+      href: "/app/walkarounds",
+      color: "bg-blue-50 border-blue-200 text-blue-700",
+      features: ["Inspeções visuais", "Checklists", "Relatórios de danos"]
+    },
+    {
+      title: "Gestão de Equipes",
+      description: "Alocação e gestão de pessoal",
+      icon: Users,
+      href: "/app/teams",
+      color: "bg-green-50 border-green-200 text-green-700",
+      features: ["Alocação de equipes", "Escalas", "Desempenho"]
+    },
+    {
+      title: "Relatórios",
+      description: "Analytics e relatórios de desempenho",
+      icon: BarChart3,
+      href: "/app/reports",
+      color: "bg-purple-50 border-purple-200 text-purple-700",
+      features: ["Métricas de desempenho", "Analytics", "Exportação"]
+    },
+    {
+      title: "Manutenção",
+      description: "Controle de manutenção preventiva",
+      icon: Settings,
+      href: "/app/maintenance",
+      color: "bg-orange-50 border-orange-200 text-orange-700",
+      features: ["Agendamentos", "Histórico", "Peças"]
+    },
+    {
+      title: "Documentação",
+      description: "Manuais e documentação técnica",
+      icon: FileText,
+      href: "/app/docs",
+      color: "bg-gray-50 border-gray-200 text-gray-700",
+      features: ["Manuais", "Procedimentos", "Checklists"]
+    },
+    {
+      title: "Segurança",
+      description: "Conformidade e segurança operacional",
+      icon: Shield,
+      href: "/app/safety",
+      color: "bg-red-50 border-red-200 text-red-700",
+      features: ["Conformidade", "Incidentes", "Auditorias"]
     }
-  }
+  ]
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p>Carregando dados...</p>
-        </div>
-      </div>
-    )
+    return <LoadingState message="Carregando Dashboard..." />
   }
 
   if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <AlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-4" />
-          <p className="text-red-500">Erro ao carregar dados: {error.message}</p>
-          <Button 
-            onClick={() => window.location.reload()} 
-            className="mt-4"
-          >
-            Tentar Novamente
-          </Button>
-        </div>
-      </div>
-    )
+    return <ErrorDisplay message={`Erro ao carregar dados: ${error.message}`} />
   }
 
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto py-4">
-        <div className="flex justify-end mb-6">
-          <Link href="/walkarounds/new">
-            <Button>Novo Atendimento/Inspeção</Button>
-          </Link>
+        {/* Header com ações rápidas */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+            <p className="text-gray-600 mt-2">Visão geral das operações e atendimentos</p>
+          </div>
+          <div className="flex gap-3">
+            <Link href="/app/walkarounds/new">
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                <ClipboardCheck className="h-4 w-4 mr-2" />
+                Novo Atendimento
+              </Button>
+            </Link>
+            <Link href="/app/walkarounds">
+              <Button variant="outline">
+                <Plane className="h-4 w-4 mr-2" />
+                Ver Todos
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Estatísticas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {stats.map((stat) => (
-            <Card key={stat.title}>
+            <Card key={stat.title} className="hover:shadow-lg transition-all duration-200">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-                <stat.icon className={`h-4 w-4 ${stat.color}`} />
+                <stat.icon className={`h-5 w-5 ${stat.color}`} />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stat.value}</div>
@@ -204,100 +218,90 @@ export default function Handling() {
           ))}
         </div>
 
-        {/* Atendimentos Recentes */}
-        <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Atendimentos Recentes</CardTitle>
-              <CardDescription>Últimos atendimentos registrados no sistema</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {recentHandlings.length > 0 ? (
-                <>
-                  <div className="space-y-4">
-                    {recentHandlings.map((item) => (
-                      <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <p className="font-medium">{item.aircraft}</p>
-                            <span className="text-sm text-gray-500">•</span>
-                            <p className="text-sm text-gray-600">Voo {item.flightNumber}</p>
-                          </div>
-                          <div className="flex items-center gap-4 text-sm text-gray-600">
-                            <span className="capitalize">{item.type}</span>
-                            <span>•</span>
-                            <span>{item.client}</span>
-                            <span>•</span>
-                            <span>{item.date}</span>
-                          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Módulos do Sistema */}
+          <div>
+            <Card className="h-full">
+              <CardHeader>
+                <CardTitle>Módulos do Sistema</CardTitle>
+                <CardDescription>Acesso rápido às funcionalidades</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {modules.map((module) => (
+                    <Link key={module.title} href={module.href}>
+                      <div className={`p-4 rounded-lg border-2 transition-all hover:shadow-md hover:scale-105 cursor-pointer ${module.color}`}>
+                        <div className="flex items-center gap-3 mb-2">
+                          <module.icon className="h-5 w-5" />
+                          <h3 className="font-semibold">{module.title}</h3>
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm font-medium">{item.time}</p>
-                          <span
-                            className={`text-xs px-2 py-1 rounded-full ${getStatusColor(item.status)}`}
-                          >
-                            {item.status}
-                          </span>
+                        <p className="text-sm opacity-80 mb-2">{module.description}</p>
+                        <div className="flex flex-wrap gap-1">
+                          {module.features.map((feature, index) => (
+                            <span key={index} className="text-xs bg-white bg-opacity-50 px-2 py-1 rounded">
+                              {feature}
+                            </span>
+                          ))}
                         </div>
                       </div>
-                    ))}
-                  </div>
-                  <div className="mt-4">
-                    <Link href="/app/walkarounds">
-                      <Button variant="outline" className="w-full">
-                        Ver Todos os Atendimentos ({handlingsData?.total || 0})
-                      </Button>
                     </Link>
-                  </div>
-                </>
-              ) : (
-                <div className="text-center py-8">
-                  <ClipboardCheck className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500 mb-4">Nenhum atendimento encontrado</p>
-                  <Link href="/walkarounds/new">
-                    <Button>Criar Primeiro Atendimento</Button>
-                  </Link>
+                  ))}
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
-        {/* Cards de Ação Rápida */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-          <Card className="bg-blue-50 border-blue-200">
+        {/* Ações Rápidas */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
             <CardContent className="pt-6">
               <div className="text-center">
-                <Users className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                <h3 className="font-semibold text-blue-900 mb-2">Gerenciar Equipe</h3>
-                <p className="text-blue-700 text-sm mb-4">Atribuir e gerenciar equipes de atendimento</p>
-                <Button variant="outline" className="border-blue-300 text-blue-700">
-                  Acessar
-                </Button>
+                <ClipboardCheck className="h-8 w-8 mx-auto mb-2" />
+                <h3 className="font-semibold mb-2">Walkaround Rápido</h3>
+                <p className="text-blue-100 text-sm mb-4">Iniciar inspeção rápida</p>
+                <Link href="/app/walkarounds/new">
+                  <Button variant="secondary" size="sm">
+                    Iniciar Agora
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-green-50 border-green-200">
+          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
             <CardContent className="pt-6">
               <div className="text-center">
-                <ClipboardCheck className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                <h3 className="font-semibold text-green-900 mb-2">Relatórios</h3>
-                <p className="text-green-700 text-sm mb-4">Gerar relatórios de desempenho</p>
-                <Button variant="outline" className="border-green-300 text-green-700">
+                <BarChart3 className="h-8 w-8 mx-auto mb-2" />
+                <h3 className="font-semibold mb-2">Relatório Diário</h3>
+                <p className="text-green-100 text-sm mb-4">Gerar relatório do dia</p>
+                <Button variant="secondary" size="sm">
                   Gerar
                 </Button>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-orange-50 border-orange-200">
+          <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
             <CardContent className="pt-6">
               <div className="text-center">
-                <AlertTriangle className="h-8 w-8 text-orange-600 mx-auto mb-2" />
-                <h3 className="font-semibold text-orange-900 mb-2">Alertas</h3>
-                <p className="text-orange-700 text-sm mb-4">Verificar incidentes e problemas</p>
-                <Button variant="outline" className="border-orange-300 text-orange-700">
+                <Users className="h-8 w-8 mx-auto mb-2" />
+                <h3 className="font-semibold mb-2">Minha Equipe</h3>
+                <p className="text-purple-100 text-sm mb-4">Gerenciar escalas</p>
+                <Button variant="secondary" size="sm">
+                  Acessar
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <AlertTriangle className="h-8 w-8 mx-auto mb-2" />
+                <h3 className="font-semibold mb-2">Alertas</h3>
+                <p className="text-orange-100 text-sm mb-4">Verificar incidentes</p>
+                <Button variant="secondary" size="sm">
                   Verificar
                 </Button>
               </div>

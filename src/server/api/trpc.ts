@@ -1,18 +1,13 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
-
 import { auth } from "@/server/auth";
 import { db } from "../db";
+import { userRoles } from "../db/schema";
+import { eq } from "drizzle-orm";
 
-/**
- * 1. CONTEXT
- *
- * Define o contexto com sessão e banco de dados
- */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   const session = await auth();
-
   return {
     session,
     db,
@@ -20,9 +15,6 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
   };
 };
 
-/**
- * 2. INITIALIZATION
- */
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
   errorFormatter({ shape, error }) {
@@ -30,31 +22,23 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
       ...shape,
       data: {
         ...shape.data,
-        zodError:
-          error.cause instanceof ZodError ? error.cause.flatten() : null,
+        zodError: error.cause instanceof ZodError ? error.cause.flatten() : null,
       },
     };
   },
 });
 
-/**
- * 3. ROUTER & PROCEDURE
- */
 export const createTRPCRouter = t.router;
 
 const timingMiddleware = t.middleware(async ({ next, path }) => {
   const start = Date.now();
-
   if (t._config.isDev) {
     const waitMs = Math.floor(Math.random() * 400) + 100;
     await new Promise((resolve) => setTimeout(resolve, waitMs));
   }
-
   const result = await next();
-
   const end = Date.now();
   console.log(`[TRPC] ${path} took ${end - start}ms to execute`);
-
   return result;
 });
 
@@ -72,5 +56,26 @@ export const protectedProcedure = t.procedure
       },
     });
   });
+
+export const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
+  const userId = ctx.session.user.id;
+
+  const userRole = await ctx.db.query.userRoles.findFirst({
+    where: eq(userRoles.userId, userId),
+    with: { role: true },
+  }) as {
+    role?: { name: string } | null;
+  } | null;
+
+  if (!userRole?.role || userRole.role.name !== "admin") {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "Acesso restrito a administradores",
+    });
+  }
+
+  return next();
+});
+
 
 export const createCallerFactory = t.createCallerFactory;

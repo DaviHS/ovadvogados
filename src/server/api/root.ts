@@ -14,7 +14,9 @@ import { handlingRouter } from "./routers/handling";
  */
 export const appRouter = createTRPCRouter({
   auth: authRouter,
-  company: companyRouter,
+  admin: createTRPCRouter({
+    company: companyRouter,
+  }),
   user: userRouter,
   role: roleRouter,
   permission: permissionRouter,
