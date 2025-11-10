@@ -71,7 +71,7 @@ export const companyRouter = createTRPCRouter({
       }
     }),
 
-  getById: adminProcedure
+  getById: protectedProcedure
     .input(z.object({ companyId: z.number() }))
     .query(async ({ input }) => {
       const company = await db.query.companies.findFirst({
@@ -107,7 +107,7 @@ export const companyRouter = createTRPCRouter({
       }
     }),
 
-  create: adminProcedure
+  create: protectedProcedure
     .input(companySchema)
     .mutation(async ({ input }) => {
       const now = new Date()
@@ -129,7 +129,7 @@ export const companyRouter = createTRPCRouter({
       return created
     }),
 
-  update: adminProcedure
+  update: protectedProcedure
     .input(companyUpdateSchema)
     .mutation(async ({ input }) => {
       const { companyId, ...data } = input
@@ -150,7 +150,7 @@ export const companyRouter = createTRPCRouter({
       return updated
     }),
 
-  toggleStatus: adminProcedure
+  toggleStatus: protectedProcedure
     .input(z.object({ 
       companyId: z.number(),
       status: z.number().min(0).max(1)
@@ -170,5 +170,47 @@ export const companyRouter = createTRPCRouter({
       }
 
       return updated
+    }),
+  getUsers: protectedProcedure
+    .input(z.object({ companyId: z.number() }))
+    .query(async ({ input }) => {
+      const companyUsers = await db
+        .select({
+          user: {
+            userId: users.userId,
+            fullName: users.fullName,
+            email: users.email,
+            status: users.status,
+          },
+          role: {
+            roleId: roles.roleId,
+            name: roles.name,
+          },
+        })
+        .from(userRoles)
+        .innerJoin(users, eq(users.userId, userRoles.userId))
+        .innerJoin(roles, eq(roles.roleId, userRoles.roleId))
+        .where(
+          and(
+            eq(userRoles.companyId, input.companyId),
+            eq(userRoles.isActive, true)
+          )
+        )
+
+      // Agrupar roles por usuário
+      const usersMap = new Map()
+      
+      for (const userRole of companyUsers) {
+        const userId = userRole.user.userId
+        if (!usersMap.has(userId)) {
+          usersMap.set(userId, {
+            ...userRole.user,
+            roles: []
+          })
+        }
+        usersMap.get(userId).roles.push(userRole.role)
+      }
+
+      return Array.from(usersMap.values())
     }),
 })

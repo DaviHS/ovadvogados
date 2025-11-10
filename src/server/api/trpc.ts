@@ -5,6 +5,8 @@ import { auth } from "@/server/auth";
 import { db } from "../db";
 import { userRoles } from "../db/schema";
 import { eq } from "drizzle-orm";
+import { permissionService } from "@/server/services/permission-service";
+import { SYSTEM_PERMISSIONS, SYSTEM_ROLES } from "@/lib/permissions";
 
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   const session = await auth();
@@ -57,25 +59,74 @@ export const protectedProcedure = t.procedure
     });
   });
 
-export const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
-  const userId = ctx.session.user.id;
+const middleware = t.middleware;
 
-  const userRole = await ctx.db.query.userRoles.findFirst({
-    where: eq(userRoles.userId, userId),
-    with: { role: true },
-  }) as {
-    role?: { name: string } | null;
-  } | null;
+export const requirePermission = (permission: string) =>
+  middleware(async ({ ctx, next }) => {
+    if (!ctx.session?.user?.id || !ctx.session.user.companyId) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
 
-  if (!userRole?.role || userRole.role.name !== "admin") {
-    throw new TRPCError({
-      code: "UNAUTHORIZED",
-      message: "Acesso restrito a administradores",
+    const hasPermission = await permissionService.hasPermission(
+      ctx.session.user.id,
+      ctx.session.user.companyId,
+      permission
+    );
+
+    if (!hasPermission) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Você não tem permissão para executar esta ação",
+      });
+    }
+
+    return next({
+      ctx: {
+        ...ctx,
+        session: ctx.session,
+      },
     });
-  }
+  });
 
-  return next();
-});
+export const requireRole = (roleNames: string[]) =>
+  middleware(async ({ ctx, next }) => {
+    if (!ctx.session?.user?.id || !ctx.session.user.companyId) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
 
+    const hasRole = await permissionService.hasRole(
+      ctx.session.user.id,
+      ctx.session.user.companyId,
+      roleNames
+    );
+
+    if (!hasRole) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Acesso restrito",
+      });
+    }
+
+    return next({
+      ctx: {
+        ...ctx,
+        session: ctx.session,
+      },
+    });
+  });
+
+export const authorizedProcedure = protectedProcedure;
+export const adminProcedure = authorizedProcedure.use(
+  requireRole([SYSTEM_ROLES.SUPER_ADMIN, SYSTEM_ROLES.COMPANY_ADMIN])
+);
+export const companyAdminProcedure = authorizedProcedure.use(
+  requireRole([SYSTEM_ROLES.COMPANY_ADMIN])
+);
+export const canManageUsersProcedure = authorizedProcedure.use(
+  requirePermission(SYSTEM_PERMISSIONS.USER_MANAGE)
+);
+export const canManageCompaniesProcedure = authorizedProcedure.use(
+  requirePermission(SYSTEM_PERMISSIONS.COMPANY_MANAGE)
+);
 
 export const createCallerFactory = t.createCallerFactory;

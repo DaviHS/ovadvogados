@@ -1,10 +1,11 @@
-import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { z } from "zod";
 import { sendPasswordResetEmail } from "@/lib/email";
 import { eq, and, gt } from "drizzle-orm";
 import { users } from "@/server/db/schema";
 import { hash } from "bcrypt-ts";
 import crypto from "node:crypto";
+import { permissionService } from "@/server/services/permission-service";
 
 export const authRouter = createTRPCRouter({
   requestPasswordReset: publicProcedure
@@ -68,5 +69,60 @@ export const authRouter = createTRPCRouter({
         .where(eq(users.userId, user.userId));
 
       return { success: true };
+    }),
+  hasPermission: protectedProcedure
+    .input(z.object({
+      permission: z.string(),
+      companyId: z.number().optional(),
+    }))
+    .query(async ({ ctx, input }) => {
+      const companyId = input.companyId || ctx.session.user.companyId
+      
+      if (!companyId) {
+        return false
+      }
+
+      return permissionService.hasPermission(
+        ctx.session.user.userId,
+        companyId,
+        input.permission
+      )
+    }),
+
+  // Buscar todas as permissões do usuário
+  getPermissions: protectedProcedure
+    .input(z.object({
+      companyId: z.number().optional(),
+    }).optional())
+    .query(async ({ ctx, input }) => {
+      const companyId = input?.companyId || ctx.session.user.companyId
+      
+      if (!companyId) {
+        return []
+      }
+
+      return permissionService.getUserPermissions(
+        ctx.session.user.userId,
+        companyId
+      )
+    }),
+
+  hasRole: protectedProcedure
+    .input(z.object({
+      roleNames: z.array(z.string()),
+      companyId: z.number().optional(),
+    }))
+    .query(async ({ ctx, input }) => {
+      const companyId = input.companyId || ctx.session.user.companyId
+      
+      if (!companyId) {
+        return false
+      }
+
+      return permissionService.hasRole(
+        ctx.session.user.userId,
+        companyId,
+        input.roleNames
+      )
     }),
 });
