@@ -1,7 +1,7 @@
 import { db } from "@/server/db"
 import { userRoles, rolePermissions, userSpecialPermissions, permissions, roles } from "@/server/db/schema"
-import { and, eq, inArray, or, sql } from "drizzle-orm"
-import { SYSTEM_PERMISSIONS, SYSTEM_ROLES } from "@/lib/permission"
+import { and, eq, inArray, isNull, or, sql } from "drizzle-orm"
+import { SYSTEM_PERMISSIONS, SYSTEM_ROLES } from "@/lib/permissions"
 
 export class PermissionService {
   // Verificar se usuário tem permissão específica
@@ -24,7 +24,7 @@ export class PermissionService {
       .then(result => result[0])
 
     if (specialPermission) {
-      return specialPermission.granted
+      return !!specialPermission.granted
     }
 
     // 2. Buscar permissões através das roles
@@ -42,7 +42,7 @@ export class PermissionService {
           eq(userRoles.isActive, true),
           eq(permissions.name, permission),
           or(
-            eq(userRoles.expiresAt, null),
+            isNull(userRoles.expiresAt),
             sql`${userRoles.expiresAt} > NOW()`
           )
         )
@@ -68,7 +68,7 @@ export class PermissionService {
           eq(userRoles.companyId, companyId),
           eq(userRoles.isActive, true),
           or(
-            eq(userRoles.expiresAt, null),
+            isNull(userRoles.expiresAt),
             sql`${userRoles.expiresAt} > NOW()`
           )
         )
@@ -109,7 +109,7 @@ export class PermissionService {
           eq(userRoles.isActive, true),
           inArray(roles.name, roleNames),
           or(
-            eq(userRoles.expiresAt, null),
+            isNull(userRoles.expiresAt),
             sql`${userRoles.expiresAt} > NOW()`
           )
         )

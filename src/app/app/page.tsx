@@ -10,10 +10,7 @@ import {
   FileText, 
   Settings,
   BarChart3,
-  Shield,
-  Calendar,
-  Clock,
-  ArrowRight
+  Shield
 } from "lucide-react"
 import Link from "next/link"
 import { usePageInfo } from "@/hooks/use-page-info"
@@ -25,22 +22,18 @@ import { LoadingState } from "@/components/ui/loading-state"
 import { ErrorDisplay } from "@/components/ui/error-display"
 
 export default function Dashboard() {
-  const breadcrumbs = useMemo(() => [ 
-    { label: "RampSync" }
-  ], []);
-  
+  const breadcrumbs = useMemo(() => [{ label: "RampSync" }], [])
+
   usePageInfo({
     title: `Dashboard`,
     breadcrumbs,
   })
 
-  // Buscar dados reais dos atendimentos
   const { data: handlingsData, isLoading, error } = api.handling.list.useQuery({
     page: 1,
     limit: 100,
   })
 
-  // Calcular estatísticas
   const stats = useMemo(() => {
     if (!handlingsData?.items) {
       return [
@@ -52,9 +45,7 @@ export default function Dashboard() {
     }
 
     const items = handlingsData.items
-    
-    // Estatísticas básicas
-    const todayItems = items.length // Para demo, mostra total
+    const todayItems = items.length
     const completedItems = items.filter(item => item.status === 2).length
     const uniqueAircrafts = new Set(items.map(item => item.aircraftRegistration).filter(Boolean)).size
     const alertsCount = items.filter(item => item.damageDetected).length
@@ -91,33 +82,6 @@ export default function Dashboard() {
     ]
   }, [handlingsData])
 
-  // Atendimentos recentes
-  const recentHandlings = useMemo(() => {
-    if (!handlingsData?.items) return []
-
-    return handlingsData.items
-      .sort((a, b) => {
-        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0
-        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0
-        return dateB - dateA
-      })
-      .slice(0, 3)
-      .map(item => {
-        const displayDate = item.createdAt ? new Date(item.createdAt) : new Date()
-        return {
-          id: item.handlingId.toString(),
-          aircraft: item.aircraftRegistration,
-          flightNumber: item.flightNumber,
-          type: item.flightType === 'arrival' ? 'Chegada' : 'Partida',
-          status: item.status === 2 ? 'Concluído' : item.status === 1 ? 'Em andamento' : 'Pendente',
-          time: item.timeCompleted,
-          date: format(displayDate, "dd/MM/yyyy", { locale: ptBR }),
-          client: item.client,
-        }
-      })
-  }, [handlingsData])
-
-  // Módulos do sistema
   const modules = [
     {
       title: "Walkarounds",
@@ -169,18 +133,12 @@ export default function Dashboard() {
     }
   ]
 
-  if (isLoading) {
-    return <LoadingState message="Carregando Dashboard..." />
-  }
-
-  if (error) {
-    return <ErrorDisplay message={`Erro ao carregar dados: ${error.message}`} />
-  }
+  if (isLoading) return <LoadingState message="Carregando Dashboard..." />
+  if (error) return <ErrorDisplay message={`Erro ao carregar dados: ${error.message}`} />
 
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto py-4">
-        {/* Header com ações rápidas */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
@@ -202,7 +160,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Estatísticas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {stats.map((stat) => (
             <Card key={stat.title} className="hover:shadow-lg transition-all duration-200">
@@ -218,41 +175,42 @@ export default function Dashboard() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Módulos do Sistema */}
-          <div>
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle>Módulos do Sistema</CardTitle>
-                <CardDescription>Acesso rápido às funcionalidades</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {modules.map((module) => (
-                    <Link key={module.title} href={module.href}>
-                      <div className={`p-4 rounded-lg border-2 transition-all hover:shadow-md hover:scale-105 cursor-pointer ${module.color}`}>
-                        <div className="flex items-center gap-3 mb-2">
-                          <module.icon className="h-5 w-5" />
-                          <h3 className="font-semibold">{module.title}</h3>
-                        </div>
-                        <p className="text-sm opacity-80 mb-2">{module.description}</p>
-                        <div className="flex flex-wrap gap-1">
-                          {module.features.map((feature, index) => (
-                            <span key={index} className="text-xs bg-white bg-opacity-50 px-2 py-1 rounded">
-                              {feature}
-                            </span>
-                          ))}
-                        </div>
+        <Card className="w-full h-full">
+          <CardHeader>
+            <CardTitle>Módulos do Sistema</CardTitle>
+            <CardDescription>Acesso rápido às funcionalidades</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {modules.map((module) => (
+                <Link key={module.title} href={module.href}>
+                  <div
+                    className={`h-full flex flex-col justify-between p-4 rounded-lg border-2 transition-all hover:shadow-md hover:scale-105 cursor-pointer ${module.color}`}
+                  >
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <module.icon className="h-5 w-5" />
+                        <h3 className="font-semibold">{module.title}</h3>
                       </div>
-                    </Link>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+                      <p className="text-sm opacity-80 mb-2">{module.description}</p>
+                    </div>
+                    <div className="flex flex-wrap gap-1 mt-auto">
+                      {module.features.map((feature, index) => (
+                        <span
+                          key={index}
+                          className="text-xs bg-white bg-opacity-50 px-2 py-1 rounded"
+                        >
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-        {/* Ações Rápidas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
           <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
             <CardContent className="pt-6">

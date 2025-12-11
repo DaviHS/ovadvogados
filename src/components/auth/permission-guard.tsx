@@ -1,35 +1,73 @@
+// src/components/auth/permission-guard.tsx
 "use client"
 
-import type React from "react"
-// import { usePermissions } from "@/hooks/use-permissions"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertTriangle } from "lucide-react"
+import { ReactNode } from "react"
+import { api } from "@/lib/api"
+import { Unauthorized } from "./unauthorized"
 
 interface PermissionGuardProps {
-  children: React.ReactNode
-  resource?: string
-  action?: string
-  roles?: string[]
-  fallback?: React.ReactNode
-  requireAll?: boolean // Se true, precisa de TODAS as permissões. Se false, precisa de pelo menos uma
+  permission: string
+  children: ReactNode
+  fallback?: ReactNode
+  companyId?: number // Opcional, pega do contexto se não informado
 }
 
-export function PermissionGuard({
-  children,
-  resource,
-  action,
-  roles = [],
-  fallback,
-  requireAll = false,
+export function PermissionGuard({ 
+  permission, 
+  children, 
+  fallback = null,
+  companyId 
 }: PermissionGuardProps) {
-  // const { hasPermission, hasAnyRole, hasRole } = usePermissions()
+  const { data: hasPermission, isLoading } = api.auth.hasPermission.useQuery(
+    { permission, companyId },
+    { 
+      enabled: true,
+      staleTime: 5 * 60 * 1000, // Cache de 5 minutos
+    }
+  )
 
-  // const hasRequiredPermission = resource && action ? hasPermission(resource, action) : true
-  // const hasRequiredRole = roles.length > 0 : true
+  if (isLoading) {
+    return <div className="animate-pulse">...</div>
+  }
 
-  // const hasAccess = requireAll ? hasRequiredPermission && hasRequiredRole : hasRequiredPermission || hasRequiredRole
+  return hasPermission ? <>{children}</> : <>{fallback}</>
+}
 
+// Hook para uso em componentes
+export function usePermission(permission: string, companyId?: number) {
+  const { data: hasPermission, isLoading } = api.auth.hasPermission.useQuery(
+    { permission, companyId },
+    { 
+      enabled: true,
+      staleTime: 5 * 60 * 1000,
+    }
+  )
 
+  return {
+    hasPermission: !!hasPermission,
+    isLoading
+  }
+}
+
+// Componente para rotas protegidas
+export function ProtectedRoute({ 
+  children, 
+  permission,
+  fallback 
+}: {
+  children: ReactNode
+  permission: string
+  fallback?: ReactNode
+}) {
+  const { hasPermission, isLoading } = usePermission(permission)
+
+  if (isLoading) {
+    return <div>Carregando permissões...</div>
+  }
+
+  if (!hasPermission) {
+    return fallback || <Unauthorized />
+  }
 
   return <>{children}</>
 }
