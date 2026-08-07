@@ -2,24 +2,13 @@
 
 import { motion } from 'framer-motion'
 import { ArrowRight, MessageCircle } from 'lucide-react'
-import Image from 'next/image'
-import { Button } from '@/components/ui/button'
 
 export function Hero() {
   return (
-    <section id="inicio" className="relative flex min-h-[100vh] items-center overflow-hidden">
-      <div className="absolute inset-0">
-        <Image
-          src="/images/hero-bg.png"
-          alt=""
-          fill
-          priority
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/40" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
-      </div>
-
+    <section
+      id="inicio"
+      className="relative flex min-h-screen items-center overflow-hidden"
+    >
       <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pt-28 md:px-10">
         <motion.p
           initial={{ opacity: 0, y: 12 }}
@@ -45,8 +34,8 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.25 }}
           className="mt-7 max-w-xl text-pretty text-base font-light leading-relaxed text-muted-foreground md:text-lg"
         >
-          Atuação estratégica, consultiva e contenciosa com foco na proteção dos seus
-          interesses e na construção de soluções jurídicas seguras.
+          Atuação estratégica, consultiva e contenciosa com foco na proteção dos
+          seus interesses e na construção de soluções jurídicas seguras.
         </motion.p>
 
         <motion.div
@@ -55,27 +44,23 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="mt-11 flex flex-col gap-4 sm:flex-row"
         >
-          <Button
-            render={<a href="#contato" />}
-            nativeButton={false}
-            size="lg"
-            className="rounded-none bg-primary px-8 text-sm font-normal tracking-wide text-primary-foreground hover:bg-primary/90"
+          <a
+            href="#contato"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-none bg-primary px-8 text-sm font-normal tracking-wide text-primary-foreground transition-colors hover:bg-primary/90"
           >
             Agendar Consulta
             <ArrowRight className="size-4" strokeWidth={1.5} />
-          </Button>
-          <Button
-            render={
-              <a href="https://wa.me/5592000000000" target="_blank" rel="noopener noreferrer" />
-            }
-            nativeButton={false}
-            size="lg"
-            variant="outline"
-            className="rounded-none border-border bg-transparent px-8 text-sm font-normal tracking-wide text-foreground hover:border-primary hover:text-primary"
+          </a>
+
+          <a
+            href="https://wa.me/5592000000000"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-none border border-border bg-transparent px-8 text-sm font-normal tracking-wide text-foreground transition-colors hover:border-primary hover:text-primary"
           >
             <MessageCircle className="size-4" strokeWidth={1.5} />
             Falar pelo WhatsApp
-          </Button>
+          </a>
         </motion.div>
 
         <motion.div
@@ -91,6 +76,7 @@ export function Hero() {
           ].map((stat) => (
             <div key={stat.label}>
               <p className="font-serif text-3xl text-primary">{stat.value}</p>
+
               <p className="mt-1 text-xs font-light leading-snug text-muted-foreground">
                 {stat.label}
               </p>
