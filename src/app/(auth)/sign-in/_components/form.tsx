@@ -1,102 +1,119 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { signIn } from "next-auth/react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import Fields from "./fields"
-import { Scale  } from "lucide-react"
+import { Scale } from "lucide-react"
 import { toast } from "sonner"
 
 export default function Form() {
-  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
     setIsLoading(true)
-    setError("")
 
-    const toastId = toast.loading("Validando credenciais...")
+    const toastId = toast.loading("Acesso à plataforma")
 
-    try {
-      const result = await signIn("credentials", {
-        redirect: false,
-        email,
-        password,
-      })
-
-      if (result?.error) {
-        setError("Credenciais inválidas. Por favor, tente novamente.")
-        toast.error("Cadastro pendente de aprovação", { id: toastId })
-      } else {
-         toast.success("Login realizado com sucesso!", { id: toastId })
-        router.push("/app")
-      }
-    } catch {
-      setError("Ocorreu um erro ao fazer login. Por favor, tente novamente.")
-      toast.error("Erro de servidor. Tente novamente mais tarde.", { id: toastId })
-    } finally {
+    // Simula uma pequena validação para manter a experiência do formulário
+    setTimeout(() => {
       setIsLoading(false)
-    }
+
+      toast.info("Plataforma em desenvolvimento", {
+        id: toastId,
+        description:
+          "O acesso ao sistema estará disponível em breve.",
+        duration: 5000,
+      })
+    }, 700)
   }
 
   const handleSupportClick = () => {
     const phoneNumber = "5511967701575"
-    const message = "Olá! Preciso de ajuda com o acesso ao Oliveira e Vasconcelos Advogados."
+    const message =
+      "Olá! Preciso de ajuda com o acesso ao Oliveira e Vasconcelos Advogados."
     const encodedMessage = encodeURIComponent(message)
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`
-    
+
     window.open(whatsappUrl, "_blank")
   }
 
   return (
-    <Card className="w-full">
-      <CardHeader className="text-center">
-        <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-          <Scale className="h-8 w-8 text-primary-foreground" />
+    <Card className="w-full max-w-md border-border shadow-sm">
+      <CardHeader className="space-y-4 text-center">
+        <div className="mx-auto flex size-12 items-center justify-center border border-border">
+          <Scale
+            className="size-5 text-primary"
+            strokeWidth={1.5}
+          />
         </div>
-        <CardTitle className="text-2xl font-bold text-center text-primary">Área do Membro</CardTitle>
-        <CardDescription className="text-center">
-          Entre com suas credenciais para acessar sua conta
-        </CardDescription>
+
+        <div>
+          <CardTitle className="font-serif text-2xl font-normal">
+            Área do Membro
+          </CardTitle>
+
+          <CardDescription className="mt-2 text-sm font-light">
+            Entre com suas credenciais para acessar sua conta
+          </CardDescription>
+        </div>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {error && (
-          <div className="p-3 bg-red-100 text-red-600 text-sm rounded">
-            {error}
-          </div>
-        )}
-        <form onSubmit={handleSubmit} className="space-y-4">
+
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-5">
           <Fields
             email={email}
             password={password}
             onEmailChange={setEmail}
             onPasswordChange={setPassword}
             showPassword={showPassword}
-            onToggleShowPassword={() => setShowPassword(!showPassword)}
+            onToggleShowPassword={() =>
+              setShowPassword(!showPassword)
+            }
           />
-          <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isLoading}>
-            {isLoading ? "Entrando..." : "Entrar"}
+
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="h-11 w-full rounded-none font-normal tracking-wide"
+          >
+            {isLoading ? "Verificando..." : "Entrar"}
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="flex flex-col space-y-2 text-center text-sm">
-        <div>
-          <span className="text-gray-500">Perdeu o acesso? </span>
-          <button 
-            onClick={handleSupportClick}
-            className="text-primary hover:underline cursor-pointer"
-          >
-            Fale com o suporte.
-          </button>
-        </div>
+
+      <CardFooter className="flex flex-col gap-3 border-t border-border pt-6">
+        <p className="text-center text-xs font-light text-muted-foreground">
+          Perdeu o acesso?
+        </p>
+
+        <button
+          type="button"
+          onClick={handleSupportClick}
+          className="text-xs font-medium tracking-wide text-primary transition-colors hover:text-primary/80"
+        >
+          Fale com o suporte
+        </button>
+
+        <Link
+          href="/"
+          className="mt-2 text-xs font-light text-muted-foreground transition-colors hover:text-primary"
+        >
+          Voltar para o site
+        </Link>
       </CardFooter>
     </Card>
   )

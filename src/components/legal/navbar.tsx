@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, LogIn } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const NAV_LINKS = [
@@ -39,7 +39,7 @@ export function Navbar() {
         {/* Logo */}
         <a
           href="#inicio"
-          className="text-lg font-medium tracking-wide text-foreground"
+          className="font-serif text-xl tracking-wide text-foreground"
         >
           Oliveira & Vasconcelos
         </a>
@@ -58,8 +58,16 @@ export function Navbar() {
           ))}
         </ul>
 
-        {/* Botão desktop */}
-        <div className="hidden lg:block">
+        {/* Ações desktop */}
+        <div className="hidden items-center gap-5 lg:flex">
+          <a
+            href="/sign-in"
+            className="inline-flex items-center gap-2 text-sm font-light tracking-wide text-muted-foreground transition-colors hover:text-primary"
+          >
+            <LogIn className="size-4" strokeWidth={1.5} />
+            Acessar plataforma
+          </a>
+
           <a
             href="#contato"
             className="inline-flex h-10 items-center justify-center rounded-none border border-primary bg-transparent px-6 text-sm font-normal tracking-wide text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
@@ -68,7 +76,6 @@ export function Navbar() {
           </a>
         </div>
 
-        {/* Menu mobile */}
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
@@ -80,7 +87,6 @@ export function Navbar() {
         </button>
       </nav>
 
-      {/* Menu mobile aberto */}
       {open && (
         <div className="border-t border-border bg-background px-6 py-6 lg:hidden">
           <ul className="flex flex-col gap-5">
@@ -98,9 +104,18 @@ export function Navbar() {
           </ul>
 
           <a
+            href="/sign-in"
+            onClick={() => setOpen(false)}
+            className="mt-6 flex h-10 w-full items-center justify-center gap-2 text-sm font-light tracking-wide text-muted-foreground transition-colors hover:text-primary"
+          >
+            <LogIn className="size-4" strokeWidth={1.5} />
+            Acessar plataforma
+          </a>
+
+          <a
             href="#contato"
             onClick={() => setOpen(false)}
-            className="mt-6 inline-flex h-10 w-full items-center justify-center rounded-none border border-primary bg-transparent text-sm font-normal tracking-wide text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+            className="mt-4 inline-flex h-10 w-full items-center justify-center rounded-none border border-primary bg-transparent text-sm font-normal tracking-wide text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
           >
             Agendar Consulta
           </a>

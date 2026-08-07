@@ -1,15 +1,12 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { ArrowRight, MessageCircle } from 'lucide-react'
+import { ArrowRight, MessageCircle, LogIn } from 'lucide-react'
 
 export function Hero() {
   return (
-    <section
-      id="inicio"
-      className="relative flex min-h-screen items-center overflow-hidden"
-    >
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pt-28 md:px-10">
+    <section>
+      <div>
         <motion.p
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -63,11 +60,27 @@ export function Hero() {
           </a>
         </motion.div>
 
+        {/* Área do cliente */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.55 }}
+          className="mt-6"
+        >
+          <a
+            href="/sign-in"
+            className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:text-primary"
+          >
+            <LogIn className="size-4" strokeWidth={1.5} />
+            Acessar plataforma
+          </a>
+        </motion.div>
+
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.7 }}
-          className="mt-20 grid max-w-xl grid-cols-3 gap-8 border-t border-border pt-8"
+          className="mt-16 grid max-w-xl grid-cols-3 gap-8 border-t border-border pt-8"
         >
           {[
             { value: '100%', label: 'Atendimento personalizado' },
