@@ -63,7 +63,7 @@ export default function Form() {
 
         <div>
           <CardTitle className="font-serif text-2xl font-normal">
-            Área do Membro
+            Acesso à plataforma
           </CardTitle>
 
           <CardDescription className="mt-2 text-sm font-light">
