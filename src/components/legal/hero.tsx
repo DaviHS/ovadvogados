@@ -70,12 +70,14 @@ export function Hero() {
           className="mt-20 grid max-w-xl grid-cols-3 gap-8 border-t border-border pt-8"
         >
           {[
-            { value: '15+', label: 'Anos de atuação' },
-            { value: '400+', label: 'Causas conduzidas' },
-            { value: '3', label: 'Áreas de excelência' },
+            { value: '100%', label: 'Atendimento personalizado' },
+            { value: 'Estratégia', label: 'Foco em soluções jurídicas' },
+            { value: '3', label: 'Áreas de atuação' },
           ].map((stat) => (
             <div key={stat.label}>
-              <p className="font-serif text-3xl text-primary">{stat.value}</p>
+              <p className="font-serif text-xl text-primary md:text-2xl">
+                {stat.value}
+              </p>
 
               <p className="mt-1 text-xs font-light leading-snug text-muted-foreground">
                 {stat.label}
