@@ -1,12 +1,8 @@
 import { type Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: {
-    template: "%s - RampSync",
-    default: "Web - RampSync",
-    absolute: "RampSync - Sistema Aeroportuários",
-  },
-    description: "Transforme seu aeroporto com soluções de automação de ponta. Reduza custos, aumente eficiência e garanta conformidade total.",
+  title: 'Oliveira e Vasconcelos Advogados | Excelência Jurídica',
+  description: 'Escritório de advocacia especializado em Direito Penal, Empresarial, Tributário, Civil e Previdenciário. Atuação estratégica, consultiva e contenciosa com foco na proteção dos seus interesses.',
   icons: [
     {
       rel: "icon",

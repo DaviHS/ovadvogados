@@ -20,7 +20,7 @@ export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
           <SessionProvider>
             <ThemeProvider 
               attribute="class" 
-              defaultTheme="light" 
+              defaultTheme="dark" 
               enableSystem 
               disableTransitionOnChange
             >
